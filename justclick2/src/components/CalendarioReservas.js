@@ -1,8 +1,8 @@
-// CalendarioReservas.js
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import '../css/CalendarioReservas.css';
 
 const CalendarioReservas = ({ selectedDate }) => {
   const [reservas, setReservas] = useState([]);
@@ -41,17 +41,19 @@ const CalendarioReservas = ({ selectedDate }) => {
   });
 
   return (
-    <div>
+    <div className="calendario-reservas">
       <h3>Reservas</h3>
-      <ul>
-      {filteredReservas.map((reserva, index) => (
-          <li key={index}>
-            {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora})
+      <ul className="reservas-lista">
+        {filteredReservas.map((reserva, index) => (
+          <li key={index} className="reserva-item">
+            <div className="reserva-nombre">{reserva.nombre}</div>
+            <div className="reserva-fecha">{reserva.fecha.toLocaleDateString()}</div>
+            <div className="reserva-hora">{reserva.hora}</div>
           </li>
         ))}
       </ul>
     </div>
   );
-}; //sadasddasd
+};
 
 export default CalendarioReservas;
