@@ -1,10 +1,9 @@
-// CalendarioReservas.js
 import React, { useState, useEffect } from 'react';
 import { db } from './firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
-const CalendarioReservas = () => {
+const CalendarioReservas = ({ selectedDate }) => {
   const [reservas, setReservas] = useState([]);
 
   useEffect(() => {
@@ -35,11 +34,16 @@ const CalendarioReservas = () => {
     obtenerReservas();
   }, []);
 
+  const filteredReservas = reservas.filter(reserva => {
+    const reservaDate = new Date(reserva.fecha);
+    return reservaDate.toDateString() === selectedDate.toDateString();
+  });
+
   return (
     <div>
       <h3>Reservas</h3>
       <ul>
-        {reservas.map((reserva, index) => (
+        {filteredReservas.map((reserva, index) => (
           <li key={index}>
             {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora})
           </li>
