@@ -11,6 +11,7 @@ import 'react-calendar/dist/Calendar.css';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
+import CalendarioReservas from './CalendarioReservas';
 
 function Inicio() {
   const [date, setDate] = useState(new Date());
@@ -118,11 +119,7 @@ function Inicio() {
 
         <section id="lista" className="section-container">
           <h2 className="h2">Lista de Nombres</h2>
-          <ul>
-            <li>Nombre 1</li>
-            <li>Nombre 2</li>
-            <li>Nombre 3</li>
-          </ul>
+          <CalendarioReservas selectedDate={date} />
         </section>
 
         <section id="estadisticas" className="section-container">
