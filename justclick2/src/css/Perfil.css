@@ -1,0 +1,259 @@
+.perfil-container {
+  display: flex;
+  flex-direction: column; 
+  justify-content: center;
+  align-items: center;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+  .perfil-box {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 50px;
+  }
+  
+  .perfil-info {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .perfil-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+  }
+  
+  .perfil-info h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .perfil-info p {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+  
+  .perfil-map {
+    width: 100%;
+    height: 300px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000; 
+}
+
+.perfil-container {
+    z-index: 1; 
+}
+
+  
+  .modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    width: 300px;
+  }
+  
+  textarea {
+    width: 100%;
+    height: 100px;
+    margin-bottom: 10px;
+  }
+  
+  input[type="file"] {
+    margin-bottom: 10px;
+  }
+  
+  .button-info {
+    width: 70%;
+    padding: 5px;
+    background: rgb(41, 41, 235);
+    margin-top: 10px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:disabled {
+    background-color: #ccc;
+  }
+
+  .nav-menu {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    background-color: transparent;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+  }
+  
+  .nav-menu .container {
+    width: 80%; 
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid black;
+  }
+  
+  .nav-menu a {
+    color: black;
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 10px;
+    text-transform: capitalize;
+    transition: color 0.3s;
+    font-weight: bold;
+    margin-right: 100px;
+    cursor: pointer;
+  }
+  
+  .nav-menu a:hover {
+    color: #5e498f;
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 20px; 
+  }
+  
+  .nav-menu .logo {
+    width: 150px; 
+    height: auto;
+  }
+  
+  .nav-menu .perfil-img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .footer {
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 20px;
+    width: 100%; 
+    position: relative; 
+  }
+  
+  .footer-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  
+
+li {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.icon {
+  margin-bottom: 2%;
+}
+
+.contact-info, .social-media, .footer-links {
+  flex: 1;
+  min-width: 250px;
+}
+
+h4 {
+  margin-top: 10px;
+  margin-bottom: 15px;
+  font-size: 18px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.contact-info ul, .footer-links ul {
+  list-style: none;
+  padding: 0;
+}
+
+.contact-info ul li, .footer-links ul li {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.contact-info ul li .icon {
+  margin-right: 10px;
+  font-size: 18px;
+  color: grey;
+}
+
+.contact-info a {
+  color: white;
+  text-decoration: none;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+.instagram-logo {
+  width: 40px;
+  transition: transform 0.3s ease;
+}
+
+.instagram-logo:hover {
+  transform: scale(1.1);
+}
+
+.footer-links ul {
+  list-style-type: none;
+  padding: 0;
+  color: white;
+  transition: color 0.3s;
+}
+
+.footer-links li {
+  margin: 10px 0;
+}
+
+.footer-links a {
+  color: white;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: color 0.3s;
+}
+
+.footer-links ul li a:hover {
+  color: rgb(119, 116, 116);
+}
+
+.footer-bottom {
+  margin-top: 20px;
+  border-top: 1px solid #000000;
+  padding-top: 15px;
+  font-size: 14px;
+}
+
