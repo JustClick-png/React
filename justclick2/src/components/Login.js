@@ -32,7 +32,6 @@ const Login = () => {
         console.error("No se encontraron datos de usuario.");
       }
 
-      alert("¡Login exitoso! 🎉");
       navigate("/inicio"); 
     } catch (err) {
       setError("Error al iniciar sesión. Verifica tus datos.");

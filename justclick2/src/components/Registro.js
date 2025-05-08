@@ -54,7 +54,6 @@ const Registro = () => {
 
       console.log("ID generado por Firebase:", docRef.id);
 
-      alert("¡Cuenta creada exitosamente!");
       navigate("/inicio");
     } catch (err) {
       console.error("Error en el registro:", err); // Muestra el error en la consola
