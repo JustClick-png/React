@@ -52,6 +52,6 @@ const CalendarioReservas = ({ selectedDate }) => {
       </ul>
     </div>
   );
-}; //sadasddasd
+}; 
 
 export default CalendarioReservas;
