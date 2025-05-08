@@ -33,6 +33,15 @@ const Perfil = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      navigate("/");
+    }
+  }, [navigate]);
+
   if (!usuarioData) {
     return <p>Cargando o no hay datos de usuario...</p>;
   }
