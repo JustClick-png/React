@@ -150,15 +150,10 @@ function Inicio() {
           />
         </section>
 
-        <section id="lista" className="section-container">
-          <h2 className="h2">Lista de Nombres</h2>
-          <CalendarioReservas selectedDate={date} />
-        </section>
-
         <section id="reservas" className="section-container">
           <h2 className="h2">Reservas</h2>
           {reservas.length === 0 ? (
-            <p>todavía no hay reservas</p>
+            <p>Todavía no hay reservas</p>
           ) : (
             <ul>
               {reservas.map((reserva, index) => (
