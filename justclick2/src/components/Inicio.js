@@ -21,6 +21,7 @@ function Inicio() {
   const today = new Date();
   const navigate = useNavigate();
   const [reservas, setReservas] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
@@ -82,9 +83,11 @@ function Inicio() {
       const user = getAuth().currentUser;
       if (!user) {
         console.error("Usuario no autenticado");
+        setIsAuthenticated(false);
         return;
       }
 
+      setIsAuthenticated(true);
       const empresaId = user.uid;  // El UID del usuario autenticado, que se usará como empresaId
 
       const q = query(collection(db, "reservas"), where("empresaId", "==", empresaId));
@@ -152,7 +155,9 @@ function Inicio() {
 
         <section id="reservas" className="section-container">
           <h2 className="h2">Reservas</h2>
-          {reservas.length === 0 ? (
+          {!isAuthenticated ? (
+            <p>Usuario no autenticado</p>
+          ) : reservas.length === 0 ? (
             <p>Todavía no hay reservas</p>
           ) : (
             <ul>
