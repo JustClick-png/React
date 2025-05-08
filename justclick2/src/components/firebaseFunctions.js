@@ -1,4 +1,3 @@
-// firebaseFunctions.js
 import { db } from './firebaseConfig';
 import { getAuth } from 'firebase/auth';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';

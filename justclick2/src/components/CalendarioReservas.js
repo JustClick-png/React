@@ -5,15 +5,18 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 
 const CalendarioReservas = ({ selectedDate }) => {
   const [reservas, setReservas] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   useEffect(() => {
     const obtenerReservas = async () => {
       const user = getAuth().currentUser;
       if (!user) {
         console.error("Usuario no autenticado");
+        setIsAuthenticated(false);
         return;
       }
 
+      setIsAuthenticated(true);
       const empresaId = user.uid;  // El UID del usuario autenticado, que se usará como empresaId
 
       const q = query(collection(db, "reservas"), where("empresaId", "==", empresaId));
@@ -44,7 +47,9 @@ const CalendarioReservas = ({ selectedDate }) => {
   return (
     <div>
       <h3>Reservas</h3>
-      {filteredReservas.length === 0 ? (
+      {!isAuthenticated ? (
+        <p>Usuario no autenticado</p>
+      ) : filteredReservas.length === 0 ? (
         <p>todavía no hay reservas</p>
       ) : (
         <ul>

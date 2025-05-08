@@ -84,6 +84,7 @@ function Inicio() {
       if (!user) {
         console.error("Usuario no autenticado");
         setIsAuthenticated(false);
+        navigate("/");
         return;
       }
 
