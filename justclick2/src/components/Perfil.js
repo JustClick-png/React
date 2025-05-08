@@ -153,7 +153,7 @@ const Perfil = () => {
         </div>
       </div>
 
-      <button className="button-info" onClick={handleLogout}>Cerrar sesión</button>
+      <button className="button-logout" onClick={handleLogout}>Cerrar sesión</button>
 
       {showModal && (
         <div className="modal">
