@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../css/Inicio.css';
 import logo from '../fotos/logoo.png';
 import perfil from '../fotos/perfil2.png';
@@ -12,11 +12,15 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
 import CalendarioReservas from './CalendarioReservas';
+import { db } from '../firebase/firebaseConfig';
+import { getAuth } from 'firebase/auth';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 
 function Inicio() {
   const [date, setDate] = useState(new Date());
   const today = new Date();
   const navigate = useNavigate();
+  const [reservas, setReservas] = useState([]);
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
@@ -72,7 +76,36 @@ function Inicio() {
         setError('Error de red al enviar el mensaje');
       });
   };
-  
+
+  useEffect(() => {
+    const obtenerReservas = async () => {
+      const user = getAuth().currentUser;
+      if (!user) {
+        console.error("Usuario no autenticado");
+        return;
+      }
+
+      const empresaId = user.uid;  // El UID del usuario autenticado, que se usará como empresaId
+
+      const q = query(collection(db, "reservas"), where("empresaId", "==", empresaId));
+      const querySnapshot = await getDocs(q);
+
+      const reservasData = querySnapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          nombre: data.nombre,
+          fecha: data.fecha.toDate(), // Convierte el Timestamp a Date
+          hora: data.hora,
+          clienteId: data.clienteId,
+          servicio: data.servicio
+        };
+      });
+      setReservas(reservasData);
+    };
+
+    obtenerReservas();
+  }, []);
 
   return (
     <div className="inicio">
@@ -120,6 +153,17 @@ function Inicio() {
         <section id="lista" className="section-container">
           <h2 className="h2">Lista de Nombres</h2>
           <CalendarioReservas selectedDate={date} />
+        </section>
+
+        <section id="reservas" className="section-container">
+          <h2 className="h2">Reservas</h2>
+          <ul>
+            {reservas.map((reserva, index) => (
+              <li key={index}>
+                {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section id="estadisticas" className="section-container">

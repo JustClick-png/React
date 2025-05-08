@@ -1,4 +1,3 @@
-// CalendarioReservas.js
 import React, { useState, useEffect } from 'react';
 import { db } from '../firebase/firebaseConfig';
 import { getAuth } from 'firebase/auth';
@@ -27,6 +26,8 @@ const CalendarioReservas = ({ selectedDate }) => {
           nombre: data.nombre,
           fecha: data.fecha.toDate(), // Convierte el Timestamp a Date
           hora: data.hora,
+          clienteId: data.clienteId,
+          servicio: data.servicio
         };
       });
       setReservas(reservasData);
@@ -46,7 +47,7 @@ const CalendarioReservas = ({ selectedDate }) => {
       <ul>
       {filteredReservas.map((reserva, index) => (
           <li key={index}>
-            {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora})
+            {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
           </li>
         ))}
       </ul>
