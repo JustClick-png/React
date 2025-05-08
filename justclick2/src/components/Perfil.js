@@ -12,6 +12,7 @@ import perfil from '../fotos/perfil2.png';
 import instaLogo from '../fotos/isnta.png';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { getAuth } from 'firebase/auth';
 
 const Perfil = () => {
   const [usuarioData, setUsuarioData] = useState(null);
@@ -103,6 +104,17 @@ const Perfil = () => {
     setLoading(false);
   };
 
+  const handleLogout = () => {
+    const auth = getAuth();
+    auth.signOut().then(() => {
+      localStorage.removeItem("userUID");
+      localStorage.removeItem("userData");
+      navigate("/");
+    }).catch((error) => {
+      console.error("Error al cerrar sesión:", error);
+    });
+  };
+
   return (
     <div className="perfil-container">
       <div className="nav-menu">
@@ -140,6 +152,8 @@ const Perfil = () => {
           </MapContainer>
         </div>
       </div>
+
+      <button className="button-info" onClick={handleLogout}>Cerrar sesión</button>
 
       {showModal && (
         <div className="modal">
