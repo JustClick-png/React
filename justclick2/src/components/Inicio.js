@@ -157,13 +157,17 @@ function Inicio() {
 
         <section id="reservas" className="section-container">
           <h2 className="h2">Reservas</h2>
-          <ul>
-            {reservas.map((reserva, index) => (
-              <li key={index}>
-                {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
-              </li>
-            ))}
-          </ul>
+          {reservas.length === 0 ? (
+            <p>todavía no hay reservas</p>
+          ) : (
+            <ul>
+              {reservas.map((reserva, index) => (
+                <li key={index}>
+                  {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
+                </li>
+              ))}
+            </ul>
+          )}
         </section>
 
         <section id="estadisticas" className="section-container">

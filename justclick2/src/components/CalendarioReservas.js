@@ -44,13 +44,17 @@ const CalendarioReservas = ({ selectedDate }) => {
   return (
     <div>
       <h3>Reservas</h3>
-      <ul>
-      {filteredReservas.map((reserva, index) => (
-          <li key={index}>
-            {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
-          </li>
-        ))}
-      </ul>
+      {filteredReservas.length === 0 ? (
+        <p>todavía no hay reservas</p>
+      ) : (
+        <ul>
+          {filteredReservas.map((reserva, index) => (
+            <li key={index}>
+              {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 }; 
