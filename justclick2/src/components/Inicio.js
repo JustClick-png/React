@@ -127,7 +127,7 @@ function Inicio() {
         </div>
       </div>
 
-      <div className="fondo-imagen">
+      <div className="fondo-imagen" style={{ backgroundImage: `url(${fondoImage})` }}>
         <div className="texto-sobre-imagen">
           <div className="titulo">JustClick</div>
           <div className="descripcion">
