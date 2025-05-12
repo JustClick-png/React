@@ -28,5 +28,5 @@ const auth = getAuth(app);
 const analytics = getAnalytics(app);
 const storage = getStorage(app);
 
-export { app, db, auth, storage };
+export { db, auth, analytics, storage };
 
