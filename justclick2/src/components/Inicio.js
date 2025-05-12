@@ -11,35 +11,30 @@ import 'react-calendar/dist/Calendar.css';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
-import CalendarioReservas from './CalendarioReservas';
-import { db } from '../firebase/firebaseConfig';
-import { getAuth } from 'firebase/auth';
-import { auth } from '../firebase/firebaseConfig'; // ya lo exportaste desde ahí
+import { db, auth } from '../firebase/firebaseConfig';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-
 
 function Inicio() {
   const [date, setDate] = useState(new Date());
   const today = new Date();
   const navigate = useNavigate();
   const [reservas, setReservas] = useState([]);
+  const [clientes, setClientes] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [nombre, setNombre] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [mensaje, setMensaje] = useState('');
+  const [error, setError] = useState('');
 
-  const handleDateChange = (newDate) => {
-    setDate(newDate);
-  };
+  const handleDateChange = (newDate) => setDate(newDate);
 
-  const handleChangePerfil = () => {
-    navigate("/perfil");
-  };
+  const handleChangePerfil = () => navigate("/perfil");
 
   const handlePrevMonth = () => {
     const prevMonth = new Date(date);
     prevMonth.setMonth(prevMonth.getMonth() - 1);
-    if (prevMonth >= today) {
-      setDate(prevMonth);
-    }
+    if (prevMonth >= today) setDate(prevMonth);
   };
 
   const handleNextMonth = () => {
@@ -48,25 +43,19 @@ function Inicio() {
     setDate(nextMonth);
   };
 
-  const [nombre, setNombre] = useState('');
-  const [correo, setCorreo] = useState('');
-  const [mensaje, setMensaje] = useState('');
-  const [error, setError] = useState('');
-
   const handleSubmit = (e) => {
     e.preventDefault();
-  
     if (!nombre || !correo || !mensaje) {
       setError('Por favor, completa todos los campos.');
       return;
     }
-  
+
     const templateParams = {
       from_name: nombre,
       from_email: correo,
       message: mensaje,
     };
-  
+
     emailjs
       .send('service_4s1z1md', 'template_hsio978', templateParams, '-yuJvUuMfk_LqKgKI')
       .then(() => {
@@ -80,49 +69,65 @@ function Inicio() {
         setError('Error de red al enviar el mensaje');
       });
   };
-  
 
-    useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, async (user) => {
-        if (user) {
-          console.log("✅ Usuario autenticado");
-          console.log("UID:", user.uid);
+  const obtenerNombreCliente = (clienteId) => {
+    const cliente = clientes.find(c => c.clienteId === clienteId);
+    if (cliente) {
+      return `${cliente.nombre} ${cliente.apellido1} ${cliente.apellido2}`;
+    }
+    return `Cliente #${clienteId}`;
+  };
 
-          setIsAuthenticated(true);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        console.log("✅ Usuario autenticado:", user.uid);
+        setIsAuthenticated(true);
 
-          try {
-            const q = query(collection(db, "reservas"), where("usuarioId", "==", user.uid));
-            const querySnapshot = await getDocs(q);
+        try {
+          // Obtener reservas
+          const reservasQuery = query(collection(db, "reservas"), where("usuarioId", "==", user.uid));
+          const reservasSnapshot = await getDocs(reservasQuery);
+          const reservasData = reservasSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              clienteId: data.clienteId,
+              estado: data.estado,
+              servicio: data.servicio,
+              hora: data.hora,
+              fecha: data.fecha.toDate(),
+            };
+          });
+          setReservas(reservasData);
 
-            console.log("🔍 Reservas encontradas:", querySnapshot.docs.length);
+          // Obtener clientes
+          const clientesSnapshot = await getDocs(collection(db, "cliente"));
+          const clientesData = clientesSnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+              id: doc.id,
+              clienteId: data.clienteId,
+              nombre: data.nombre,
+              apellido1: data.apellido1,
+              apellido2: data.apellido2,
+            };
+          });
+          setClientes(clientesData);
 
-            const reservasData = querySnapshot.docs.map(doc => {
-              const data = doc.data();
-              return {
-                id: doc.id,
-                clienteId: data.clienteId,
-                estado: data.estado,
-                servicio: data.servicio,
-                hora: data.hora,
-                fecha: data.fecha.toDate(), // Asegúrate que sea Timestamp
-              };
-            });
-
-            setReservas(reservasData);
-          } catch (error) {
-            console.error("❌ Error cargando reservas:", error);
-          }
-
-        } else {
-          console.log("❌ Usuario NO autenticado");
-          setIsAuthenticated(false);
-          navigate("/");
+        } catch (error) {
+          console.error("❌ Error cargando datos:", error);
         }
-      });
 
-  return () => unsubscribe();
-}, []);
+      } else {
+        console.log("❌ Usuario NO autenticado");
+        setIsAuthenticated(false);
+        navigate("/");
+      }
+    });
 
+    return () => unsubscribe();
+  }, []);
 
   return (
     <div className="inicio">
@@ -144,7 +149,7 @@ function Inicio() {
         <div className="texto-sobre-imagen">
           <div className="titulo">JustClick</div>
           <div className="descripcion">
-            Aquí puedes gestionar tus reservas, ver clientes interesados y promocionar tus servicios <br/> fácilmente. Disfruta de todas las herramientas para hacer crecer tu peluquería.
+            Aquí puedes gestionar tus reservas, ver clientes interesados y promocionar tus servicios <br /> fácilmente. Disfruta de todas las herramientas para hacer crecer tu peluquería.
           </div>
         </div>
       </div>
@@ -160,9 +165,8 @@ function Inicio() {
             prev2Label={null}
             prevLabel={<span onClick={handlePrevMonth} className="react-calendar__navigation__arrow">&#10094;</span>}
             nextLabel={<span onClick={handleNextMonth} className="react-calendar__navigation__arrow">&#10095;</span>}
-            formatMonthYear={(locale, date) => 
-              date.toLocaleString('es-ES', { month: 'long', year: 'numeric' })
-                .replace(/^./, (str) => str.toUpperCase())
+            formatMonthYear={(locale, date) =>
+              date.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).replace(/^./, str => str.toUpperCase())
             }
           />
         </section>
@@ -177,7 +181,8 @@ function Inicio() {
             <ul>
               {reservas.map((reserva, index) => (
                 <li key={index}>
-                  {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} - {reserva.servicio} (Estado: {reserva.estado}) - Cliente: {reserva.clienteId}
+                  {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} - {reserva.servicio} (Estado: {reserva.estado})<br />
+                  Cliente: {obtenerNombreCliente(reserva.clienteId)}
                 </li>
               ))}
             </ul>
@@ -194,44 +199,25 @@ function Inicio() {
           </div>
         </section>
 
-        {/* Sección de Contacto */}
         <section id="contacto" className="section-container">
-        <h2 className="h2">Contacto</h2>
-        <div className="contacto-container">
-          <div className="contacto-formulario">
-            <form onSubmit={handleSubmit} className="contact-form">
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                value={nombre}
-                onChange={(e) => setNombre(e.target.value)}
-                required
-              />
-              <input
-                type="email"
-                placeholder="Tu correo electrónico"
-                value={correo}
-                onChange={(e) => setCorreo(e.target.value)}
-                required
-              />
-              <textarea
-                placeholder="Escribe tu mensaje"
-                value={mensaje}
-                onChange={(e) => setMensaje(e.target.value)}
-                required
-              />
-              {error && <p style={{ color: 'red' }}>{error}</p>}
-              <button type="submit" className="button-contact">Enviar Mensaje</button>
-            </form>
+          <h2 className="h2">Contacto</h2>
+          <div className="contacto-container">
+            <div className="contacto-formulario">
+              <form onSubmit={handleSubmit} className="contact-form">
+                <input type="text" placeholder="Tu nombre" value={nombre} onChange={(e) => setNombre(e.target.value)} required />
+                <input type="email" placeholder="Tu correo electrónico" value={correo} onChange={(e) => setCorreo(e.target.value)} required />
+                <textarea placeholder="Escribe tu mensaje" value={mensaje} onChange={(e) => setMensaje(e.target.value)} required />
+                {error && <p style={{ color: 'red' }}>{error}</p>}
+                <button type="submit" className="button-contact">Enviar Mensaje</button>
+              </form>
+            </div>
+            <div className="contacto-info">
+              <p><FaEnvelope /> <a href="mailto:equipo.almi.a@gmail.com">equipo.almi.a@gmail.com</a></p>
+              <p><FaPhone /> <a href="tel:+34698375148">698375148</a></p>
+              <p><FaMapMarkerAlt /> Agirre Lehendakariaren Etorb., 29, 48014 Bilbao</p>
+            </div>
           </div>
-          
-          <div className="contacto-info">
-            <p><FaEnvelope /> <a href="mailto:equipo.almi.a@gmail.com">equipo.almi.a@gmail.com</a></p>
-            <p><FaPhone /> <a href="tel:+34698375148">698375148</a></p>
-            <p><FaMapMarkerAlt /> Agirre Lehendakariaren Etorb., 29, 48014 Bilbao</p>
-          </div>
-        </div>
-      </section>
+        </section>
       </div>
 
       <footer className="footer">
@@ -256,9 +242,7 @@ function Inicio() {
         </div>
       </footer>
 
-      <button className="scroll-to-top" onClick={() => window.scrollTo(0, 0)}>
-        ↑
-      </button>
+      <button className="scroll-to-top" onClick={() => window.scrollTo(0, 0)}>↑</button>
     </div>
   );
 }
