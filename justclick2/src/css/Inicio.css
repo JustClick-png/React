@@ -583,3 +583,113 @@ h4 {
   text-overflow: ellipsis;
   text-align: left;
 }
+
+.calendario-dia-reservado {
+  background-color: #ede205a8 !important;
+  color: black;
+  border-radius: 50%;
+}
+
+.resumen-estadisticas {
+  background-color: #f9f9f9;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 1rem;
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  color: #333;
+}
+
+.crear-reserva-btn {
+  background-color: #5e498f;
+  color: white;
+  font-weight: 600;
+  padding: 6px 14px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.crear-reserva-btn:hover {
+  background-color: #3e3370;
+}
+
+.formulario-reserva {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.formulario-reserva input,
+.formulario-reserva select {
+  padding: 8px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 100%;
+}
+
+.formulario-reserva input:focus,
+.formulario-reserva select:focus {
+  outline: none;
+  border-color: #5e498f;
+  box-shadow: 0 0 5px rgba(94, 73, 143, 0.5);
+}
+
+.formulario-reserva button[type=\"submit\"] {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px;
+  font-size: 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.formulario-reserva button[type="submit"] {
+  background: linear-gradient(135deg, #4CAF50, #45A049);
+  color: white;
+  font-weight: bold;
+  border: none;
+  padding: 5px 8px;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.formulario-reserva button[type="submit"]:hover {
+  background: linear-gradient(135deg, #45A049, #3d8b40);
+  transform: scale(1.02);
+}
+
+
+.modal-contenido > button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  margin-top: 15px;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.modal-contenido > button:hover {
+  background-color: #5a6268;
+}
+
+.saludo {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-left: 200px;
+  color: white;
+  text-decoration: underline;
+}

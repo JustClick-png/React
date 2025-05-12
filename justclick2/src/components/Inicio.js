@@ -12,7 +12,7 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
 import { db, auth } from '../firebase/firebaseConfig';
-import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, updateDoc, addDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 function Inicio() {
@@ -29,6 +29,32 @@ function Inicio() {
   const [correo, setCorreo] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
+  const [mostrarFormulario, setMostrarFormulario] = useState(false);
+  const [nombreEmpresa, setNombreEmpresa] = useState('');
+
+  const [nuevaReserva, setNuevaReserva] = useState({
+    fecha: '',
+    hora: '',
+    clienteId: '',
+    servicio: '',
+    estado: 'Aceptada'
+  });
+
+  const guardarNuevaReserva = async (e) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, 'reservas'), {
+        ...nuevaReserva,
+        fecha: new Date(nuevaReserva.fecha + 'T' + nuevaReserva.hora),
+        usuarioId: auth.currentUser.uid
+      });
+      alert('Reserva creada correctamente');
+      setMostrarFormulario(false);
+      window.location.reload();
+    } catch (err) {
+      console.error('Error creando reserva:', err);
+    }
+  };
 
   const handleDateChange = (newDate) => {
     setDate(newDate);
@@ -55,6 +81,28 @@ function Inicio() {
     }
     return `Cliente #${clienteId}`;
   };
+
+  const contarReservasHoy = () => {
+  const hoy = new Date().toDateString();
+    return reservas.filter(r => r.fecha.toDateString() === hoy).length;
+  };
+
+  const contarReservasMes = () => {
+    const mesActual = new Date().getMonth();
+    return reservas.filter(r => r.fecha.getMonth() === mesActual).length;
+  };
+
+  const contarClientesMes = () => {
+    const mesActual = new Date().getMonth();
+    const clientesUnicos = new Set();
+    reservas.forEach(r => {
+      if (r.fecha.getMonth() === mesActual) {
+        clientesUnicos.add(r.clienteId);
+      }
+    });
+    return clientesUnicos.size;
+  };
+
 
   const filtrarReservasPorFecha = (fechaSeleccionada) => {
   const fechaSolo = fechaSeleccionada.toDateString(); // Ignora hora
@@ -128,6 +176,13 @@ function Inicio() {
         setIsAuthenticated(true);
 
         try {
+          const empresaQuery = query(collection(db, "empresa"), where("usuarioId", "==", user.uid));
+          const empresaSnapshot = await getDocs(empresaQuery);
+          if (!empresaSnapshot.empty) {
+            const empresaData = empresaSnapshot.docs[0].data();
+            setNombreEmpresa(empresaData.nombre);
+          }
+
           const reservasQuery = query(collection(db, "reservas"), where("usuarioId", "==", user.uid));
           const reservasSnapshot = await getDocs(reservasQuery);
           const reservasData = reservasSnapshot.docs.map(doc => {
@@ -192,6 +247,9 @@ function Inicio() {
       <div className="fondo-imagen" style={{ backgroundImage: `url(${fondoImage})` }}>
         <div className="texto-sobre-imagen">
           <div className="titulo">JustClick</div>
+          {nombreEmpresa && (
+            <p className="saludo">Bienvenido, {nombreEmpresa}</p>
+          )}
           <div className="descripcion">
             Aquí puedes gestionar tus reservas, ver clientes interesados y promocionar tus servicios <br /> fácilmente.
           </div>
@@ -213,6 +271,12 @@ function Inicio() {
             formatMonthYear={(locale, date) =>
               date.toLocaleString('es-ES', { month: 'long', year: 'numeric' }).replace(/^./, str => str.toUpperCase())
             }
+            tileClassName={({ date: tileDate }) => {
+            const tieneReserva = reservas.some(
+              (reserva) => reserva.fecha.toDateString() === tileDate.toDateString()
+            );
+            return tieneReserva ? 'calendario-dia-reservado' : null;
+          }}
           />
         </section>
 
@@ -246,6 +310,19 @@ function Inicio() {
               )}
             </ul>
           )}
+          <button onClick={() => setMostrarFormulario(true)} className="crear-reserva-btn">
+            + Crear nueva reserva
+          </button>
+        </section>
+
+        {/* RESUMEN */}
+        <section id="resumen" className="section-container">
+          <h2 className="h2">Resumen</h2>
+            <div className="resumen-estadisticas">
+              <p>✅ {contarReservasHoy()} reservas hoy</p>
+              <p>📆 {contarReservasMes()} este mes</p>
+              <p>👥 {contarClientesMes()} clientes únicos</p>
+            </div>
         </section>
 
         {/* MODAL DE RESERVA */}
@@ -284,16 +361,32 @@ function Inicio() {
           </div>
         )}
 
-        {/* ESTADÍSTICAS */}
-        <section id="estadisticas" className="section-container">
-          <h2 className="h2">Estadísticas</h2>
-          <div className="estadisticas-imagenes">
-            <h4>Estadísticas del Mes</h4>
-            <img src={mesImage} alt="Estadísticas del Mes" className="estadisticas-img" />
-            <h4>Estadísticas del Año</h4>
-            <img src={añoImage} alt="Estadísticas del Año" className="estadisticas-img" />
+      {/* FORMULARIO NUEVA RESERVA */}
+      {mostrarFormulario && (
+        <div className="modal-fondo">
+          <div className="modal-contenido">
+            <h3>Nueva reserva</h3>
+            <form onSubmit={guardarNuevaReserva} className="formulario-reserva">
+              <input type="date" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, fecha: e.target.value })} />
+              <input type="time" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, hora: e.target.value })} />
+              <select required onChange={(e) => setNuevaReserva({ ...nuevaReserva, clienteId: e.target.value })}>
+                <option value="">Selecciona cliente</option>
+                {clientes.map((cli, idx) => (
+                  <option key={idx} value={cli.clienteId}>{cli.nombre} {cli.apellido1}</option>
+                ))}
+              </select>
+              <input type="text" placeholder="Servicio" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, servicio: e.target.value })} />
+              <select onChange={(e) => setNuevaReserva({ ...nuevaReserva, estado: e.target.value })}>
+                <option value="Aceptada">Aceptada</option>
+                <option value="Cancelada">Cancelada</option>
+                <option value="Completada">Completada</option>
+              </select>
+              <button type="submit">Guardar</button>
+            </form>
+            <button onClick={() => setMostrarFormulario(false)}>Cerrar</button>
           </div>
-        </section>
+        </div>
+      )}
 
         {/* CONTACTO */}
         <section id="contacto" className="section-container">
