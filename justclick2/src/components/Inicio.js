@@ -12,7 +12,7 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
 import { db, auth } from '../firebase/firebaseConfig';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 function Inicio() {
@@ -20,15 +20,20 @@ function Inicio() {
   const today = new Date();
   const navigate = useNavigate();
   const [reservas, setReservas] = useState([]);
+  const [reservasFiltradas, setReservasFiltradas] = useState([]);
   const [clientes, setClientes] = useState([]);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [reservaSeleccionada, setReservaSeleccionada] = useState(null);
+  const [mostrarModal, setMostrarModal] = useState(false);
   const [nombre, setNombre] = useState('');
   const [correo, setCorreo] = useState('');
   const [mensaje, setMensaje] = useState('');
   const [error, setError] = useState('');
 
-  const handleDateChange = (newDate) => setDate(newDate);
-
+  const handleDateChange = (newDate) => {
+    setDate(newDate);
+    filtrarReservasPorFecha(newDate);
+  };
   const handleChangePerfil = () => navigate("/perfil");
 
   const handlePrevMonth = () => {
@@ -41,6 +46,53 @@ function Inicio() {
     const nextMonth = new Date(date);
     nextMonth.setMonth(nextMonth.getMonth() + 1);
     setDate(nextMonth);
+  };
+
+  const obtenerNombreCorto = (clienteId) => {
+  const cliente = clientes.find(c => c.clienteId === clienteId);
+    if (cliente) {
+      return `${cliente.nombre} ${cliente.apellido1}`;
+    }
+    return `Cliente #${clienteId}`;
+  };
+
+  const filtrarReservasPorFecha = (fechaSeleccionada) => {
+  const fechaSolo = fechaSeleccionada.toDateString(); // Ignora hora
+  const filtradas = reservas.filter(reserva =>
+      reserva.fecha.toDateString() === fechaSolo
+    );
+    setReservasFiltradas(filtradas);
+  };
+
+  const esHoy = (fecha) => {
+  const hoy = new Date();
+    return fecha.toDateString() === hoy.toDateString();
+  };
+
+  const obtenerNombreCliente = (clienteId) => {
+    const cliente = clientes.find(c => c.clienteId === clienteId);
+    if (cliente) {
+      return `${cliente.nombre} ${cliente.apellido1} ${cliente.apellido2}`;
+    }
+    return `Cliente #${clienteId}`;
+  };
+
+  const handleReservaClick = (reserva) => {
+    setReservaSeleccionada(reserva);
+    setMostrarModal(true);
+  };
+
+  const actualizarEstadoReserva = async (reservaId, nuevoEstado) => {
+    try {
+      const ref = doc(db, 'reservas', reservaId);
+      await updateDoc(ref, { estado: nuevoEstado });
+      setReservas(prev =>
+        prev.map(r => r.id === reservaId ? { ...r, estado: nuevoEstado } : r)
+      );
+      setMostrarModal(false);
+    } catch (error) {
+      console.error('Error actualizando estado:', error);
+    }
   };
 
   const handleSubmit = (e) => {
@@ -70,22 +122,12 @@ function Inicio() {
       });
   };
 
-  const obtenerNombreCliente = (clienteId) => {
-    const cliente = clientes.find(c => c.clienteId === clienteId);
-    if (cliente) {
-      return `${cliente.nombre} ${cliente.apellido1} ${cliente.apellido2}`;
-    }
-    return `Cliente #${clienteId}`;
-  };
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        console.log("✅ Usuario autenticado:", user.uid);
         setIsAuthenticated(true);
 
         try {
-          // Obtener reservas
           const reservasQuery = query(collection(db, "reservas"), where("usuarioId", "==", user.uid));
           const reservasSnapshot = await getDocs(reservasQuery);
           const reservasData = reservasSnapshot.docs.map(doc => {
@@ -100,8 +142,8 @@ function Inicio() {
             };
           });
           setReservas(reservasData);
+          filtrarReservasPorFecha(new Date()); // Al cargar, muestra reservas del día actual
 
-          // Obtener clientes
           const clientesSnapshot = await getDocs(collection(db, "cliente"));
           const clientesData = clientesSnapshot.docs.map(doc => {
             const data = doc.data();
@@ -111,16 +153,16 @@ function Inicio() {
               nombre: data.nombre,
               apellido1: data.apellido1,
               apellido2: data.apellido2,
+              telefono: data.telefono,
+              correo: data.correo
             };
           });
           setClientes(clientesData);
-
         } catch (error) {
           console.error("❌ Error cargando datos:", error);
         }
 
       } else {
-        console.log("❌ Usuario NO autenticado");
         setIsAuthenticated(false);
         navigate("/");
       }
@@ -131,6 +173,7 @@ function Inicio() {
 
   return (
     <div className="inicio">
+      {/* NAV */}
       <div className="nav-menu">
         <div className="container">
           <img src={logo} alt="Logo" className="logo" />
@@ -145,16 +188,18 @@ function Inicio() {
         </div>
       </div>
 
+      {/* HEADER */}
       <div className="fondo-imagen" style={{ backgroundImage: `url(${fondoImage})` }}>
         <div className="texto-sobre-imagen">
           <div className="titulo">JustClick</div>
           <div className="descripcion">
-            Aquí puedes gestionar tus reservas, ver clientes interesados y promocionar tus servicios <br /> fácilmente. Disfruta de todas las herramientas para hacer crecer tu peluquería.
+            Aquí puedes gestionar tus reservas, ver clientes interesados y promocionar tus servicios <br /> fácilmente.
           </div>
         </div>
       </div>
 
       <div className="inicio-container">
+        {/* CALENDARIO */}
         <section id="calendario" className="section-container">
           <h2 className="h2">Calendario</h2>
           <Calendar
@@ -171,6 +216,7 @@ function Inicio() {
           />
         </section>
 
+        {/* RESERVAS */}
         <section id="reservas" className="section-container">
           <h2 className="h2">Reservas</h2>
           {!isAuthenticated ? (
@@ -179,16 +225,66 @@ function Inicio() {
             <p>Todavía no hay reservas</p>
           ) : (
             <ul>
-              {reservas.map((reserva, index) => (
-                <li key={index}>
-                  {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} - {reserva.servicio} (Estado: {reserva.estado})<br />
-                  Cliente: {obtenerNombreCliente(reserva.clienteId)}
-                </li>
-              ))}
+              {reservasFiltradas.length === 0 ? (
+                esHoy(date) ? (
+                  <p>Hoy no hay reservas programadas.</p>
+                ) : (
+                  <p>No hay reservas en esta fecha.</p>
+                )
+              ) : (
+                <ul>
+                  {reservasFiltradas.map((reserva, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleReservaClick(reserva)}
+                      className="reserva-item"
+                    >
+                      <strong>{reserva.fecha.toLocaleDateString()}</strong> – {obtenerNombreCorto(reserva.clienteId)} – {reserva.estado}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </ul>
           )}
         </section>
 
+        {/* MODAL DE RESERVA */}
+        {mostrarModal && reservaSeleccionada && (
+          <div className="modal-fondo">
+            <div className="modal-contenido">
+              <h3>Detalles de la reserva</h3>
+              <p><strong>Servicio:</strong> {reservaSeleccionada.servicio}</p>
+              <p><strong>Fecha:</strong> {reservaSeleccionada.fecha.toLocaleString()}</p>
+              {(() => {
+                const cliente = clientes.find(c => c.clienteId === reservaSeleccionada.clienteId);
+                if (cliente) {
+                  return (
+                    <>
+                      <p><strong>Cliente:</strong> {cliente.nombre} {cliente.apellido1} {cliente.apellido2}</p>
+                      <p><strong>Teléfono:</strong> {cliente.telefono}</p>
+                      <p><strong>Correo:</strong> {cliente.correo}</p>
+                    </>
+                  );
+                }
+                return <p>Cliente no encontrado.</p>;
+              })()}
+              <div className="estado-botones">
+                <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Aceptada')}>
+                  Aceptar
+                </button>
+                <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Cancelada')}>
+                  Cancelar
+                </button>
+                <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Completada')}>
+                  Completada
+                </button>
+              </div>
+              <button onClick={() => setMostrarModal(false)}>Cerrar</button>
+            </div>
+          </div>
+        )}
+
+        {/* ESTADÍSTICAS */}
         <section id="estadisticas" className="section-container">
           <h2 className="h2">Estadísticas</h2>
           <div className="estadisticas-imagenes">
@@ -199,6 +295,7 @@ function Inicio() {
           </div>
         </section>
 
+        {/* CONTACTO */}
         <section id="contacto" className="section-container">
           <h2 className="h2">Contacto</h2>
           <div className="contacto-container">
@@ -220,6 +317,7 @@ function Inicio() {
         </section>
       </div>
 
+      {/* FOOTER */}
       <footer className="footer">
         <div className="footer-content">
           <div className="contact-info">
