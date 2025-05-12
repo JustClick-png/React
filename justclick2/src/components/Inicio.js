@@ -14,7 +14,10 @@ import emailjs from 'emailjs-com';
 import CalendarioReservas from './CalendarioReservas';
 import { db } from '../firebase/firebaseConfig';
 import { getAuth } from 'firebase/auth';
+import { auth } from '../firebase/firebaseConfig'; // ya lo exportaste desde ahí
 import { collection, getDocs, query, where } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
 
 function Inicio() {
   const [date, setDate] = useState(new Date());
@@ -77,39 +80,49 @@ function Inicio() {
         setError('Error de red al enviar el mensaje');
       });
   };
+  
 
-  useEffect(() => {
-    const obtenerReservas = async () => {
-      const user = getAuth().currentUser;
-      if (!user) {
-        console.error("Usuario no autenticado");
-        setIsAuthenticated(false);
-        navigate("/");
-        return;
-      }
+    useEffect(() => {
+      const unsubscribe = onAuthStateChanged(auth, async (user) => {
+        if (user) {
+          console.log("✅ Usuario autenticado");
+          console.log("UID:", user.uid);
 
-      setIsAuthenticated(true);
-      const empresaId = user.uid;  // El UID del usuario autenticado, que se usará como empresaId
+          setIsAuthenticated(true);
 
-      const q = query(collection(db, "reservas"), where("empresaId", "==", empresaId));
-      const querySnapshot = await getDocs(q);
+          try {
+            const q = query(collection(db, "reservas"), where("usuarioId", "==", user.uid));
+            const querySnapshot = await getDocs(q);
 
-      const reservasData = querySnapshot.docs.map(doc => {
-        const data = doc.data();
-        return {
-          id: doc.id,
-          nombre: data.nombre,
-          fecha: data.fecha.toDate(), // Convierte el Timestamp a Date
-          hora: data.hora,
-          clienteId: data.clienteId,
-          servicio: data.servicio
-        };
+            console.log("🔍 Reservas encontradas:", querySnapshot.docs.length);
+
+            const reservasData = querySnapshot.docs.map(doc => {
+              const data = doc.data();
+              return {
+                id: doc.id,
+                clienteId: data.clienteId,
+                estado: data.estado,
+                servicio: data.servicio,
+                hora: data.hora,
+                fecha: data.fecha.toDate(), // Asegúrate que sea Timestamp
+              };
+            });
+
+            setReservas(reservasData);
+          } catch (error) {
+            console.error("❌ Error cargando reservas:", error);
+          }
+
+        } else {
+          console.log("❌ Usuario NO autenticado");
+          setIsAuthenticated(false);
+          navigate("/");
+        }
       });
-      setReservas(reservasData);
-    };
 
-    obtenerReservas();
-  }, []);
+  return () => unsubscribe();
+}, []);
+
 
   return (
     <div className="inicio">
@@ -164,7 +177,7 @@ function Inicio() {
             <ul>
               {reservas.map((reserva, index) => (
                 <li key={index}>
-                  {reserva.nombre} - {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} ({reserva.hora}) - Cliente ID: {reserva.clienteId} - Servicio: {reserva.servicio}
+                  {reserva.fecha.toLocaleDateString()} {reserva.fecha.toLocaleTimeString()} - {reserva.servicio} (Estado: {reserva.estado}) - Cliente: {reserva.clienteId}
                 </li>
               ))}
             </ul>
