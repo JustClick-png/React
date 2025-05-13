@@ -248,7 +248,7 @@ function Inicio() {
         <div className="texto-sobre-imagen">
           <div className="titulo">JustClick</div>
           {nombreEmpresa && (
-            <p className="saludo">Bienvenido, {nombreEmpresa}</p>
+            <p className="saludo">Bienvenida, {nombreEmpresa}</p>
           )}
           <div className="descripcion">
             Aquí puedes gestionar tus reservas, ver clientes interesados y promocionar tus servicios <br /> fácilmente.
