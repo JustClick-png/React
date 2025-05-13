@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../css/Inicio.css';
 import logo from '../fotos/logoo.png';
 import perfil from '../fotos/perfil2.png';
-import mesImage from '../fotos/mes.png';
-import añoImage from '../fotos/año.png';
+import chatIcon from '../fotos/chat.png';
 import fondoImage from '../fotos/fondo.jpg'; 
 import Calendar from 'react-calendar';
 import instaLogo from '../fotos/isnta.png';
@@ -205,9 +204,14 @@ function Inicio() {
             where("leido", "==", false)
           );
           const mensajesSnapshot = await getDocs(mensajesQuery);
-          const cantidad = mensajesSnapshot.size;
-          setMensajesSinLeer(cantidad);
-          console.log("📨 Mensajes sin leer:", cantidad);
+
+          // Filtramos solo los mensajes que NO ha enviado el usuario
+          const mensajesNoLeidosParaMi = mensajesSnapshot.docs.filter(doc => doc.data().emisorId !== user.uid);
+
+          setMensajesSinLeer(mensajesNoLeidosParaMi.length);
+          console.log("Mensajes no leídos para mí:", mensajesNoLeidosParaMi.length);
+
+
 
           const clientesSnapshot = await getDocs(collection(db, "cliente"));
           const clientesData = clientesSnapshot.docs.map(doc => {
@@ -285,8 +289,17 @@ function Inicio() {
             <a href="#calendario">Calendario</a>
             <a href="#lista">Lista</a>
             <a href="#estadisticas">Estadísticas</a>
-            <button onClick={() => navigate('/chat')} className="chat-btn">
-              💬 Chat {mensajesSinLeer > 0 && <span className="chat-badge">{mensajesSinLeer}</span>}
+            <button onClick={() => navigate('/chat')} className="chat-btn" style={{ position: 'relative', background: 'none', border: 'none' }}>
+              <img src={chatIcon} alt="Chat" style={{ width: '40px', height: '40px' }} />
+              {mensajesSinLeer > 0 && (
+                <span className="chat-badge" style={{
+                  position: 'absolute',
+                  top: '-6px',
+                  right: '-6px'
+                }}>
+                  {mensajesSinLeer}
+                </span>
+              )}
             </button>
           </div>
           <div className="perfil-img">
@@ -355,7 +368,7 @@ function Inicio() {
                       onClick={() => handleReservaClick(reserva)}
                       className="reserva-item"
                     >
-                      <strong>{reserva.fecha.toLocaleDateString()}</strong> – {obtenerNombreCorto(reserva.clienteId)} – {reserva.estado}
+                    <strong>{reserva.fecha.toLocaleDateString()}</strong> – {obtenerNombreCorto(reserva.clienteId)} – {reserva.estado}
                     </li>
                   ))}
                 </ul>

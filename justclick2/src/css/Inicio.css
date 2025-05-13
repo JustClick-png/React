@@ -578,7 +578,7 @@ h4 {
 }
 
 .reserva-item {
-  display: inline-block;        /* Fuerza que se mantenga en línea */
+  display: block;        /* Fuerza que se mantenga en línea */
   font-size: 1rem;
   margin-bottom: 0.3rem;
   margin-top: 1rem;

@@ -1,0 +1,153 @@
+.chat-container {
+  display: flex;
+  height: 100vh;
+  background-color: #f0f0f0;
+  font-family: 'Segoe UI', sans-serif;
+  position: relative;
+}
+
+.chat-clientes {
+  width: 30%;
+  border-right: 1px solid #ccc;
+  padding: 20px;
+  overflow-y: auto;
+  background-color: #e9e9e9;
+}
+
+.chat-clientes h3 {
+  margin-bottom: 10px;
+}
+
+.chat-buscador {
+  margin-bottom: 15px;
+}
+
+.chat-buscador input {
+  width: 100%;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.chat-clientes ul {
+  list-style: none;
+  padding: 0;
+}
+
+.chat-clientes li {
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.chat-clientes li:hover {
+  background-color: #dce5f4;
+}
+
+.chat-clientes .seleccionado {
+  background-color: #d0eaff;
+}
+
+.chat-mensajes-container {
+  width: 70%;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.chat-mensajes-titulo {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.chat-mensajes {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 15px;
+  border: 1px solid #ccc;
+  background-color: #fdfdfd;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.chat-burbuja {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+
+.chat-burbuja.emisor {
+  justify-content: flex-end;
+}
+
+.chat-mensaje {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background-color: #ffffff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+  position: relative;
+  font-size: 14px;
+}
+
+.chat-burbuja.emisor .chat-mensaje {
+  background-color: #daf8cb;
+}
+
+.chat-hora {
+  font-size: 10px;
+  color: #666;
+  margin-top: 4px;
+  text-align: right;
+}
+
+.chat-formulario {
+  display: flex;
+  gap: 10px;
+}
+
+.chat-formulario input[type="text"] {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.chat-formulario button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.chat-formulario button:hover {
+  background-color: #357bd8;
+}
+
+.chat-volver-icono {
+  position: fixed;         /* Lo hace flotar en la esquina */
+  top: 15px;
+  left: 15px;
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #333;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1000;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.chat-volver-icono:hover {
+  transform: scale(1.2);   /* Aumenta el tamaño */
+  color: black;          /* Puedes personalizar el color */
+}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db, auth } from '../firebase/firebaseConfig';
 import '../css/Chat.css';
 import {
@@ -8,10 +8,12 @@ import {
   onSnapshot,
   addDoc,
   getDocs,
-  serverTimestamp
+  serverTimestamp,
+  updateDoc,
+  doc
 } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
-import { updateDoc, doc } from 'firebase/firestore';
+import { useNavigate } from 'react-router-dom';
 
 const Chat = () => {
   const [mensajes, setMensajes] = useState([]);
@@ -20,8 +22,16 @@ const Chat = () => {
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
   const [usuarioId, setUsuarioId] = useState('');
   const [emisorId, setEmisorId] = useState('');
+  const [busqueda, setBusqueda] = useState('');
+  const navigate = useNavigate();
+  const mensajesEndRef = useRef(null);
 
-  // Detectar usuario autenticado
+  const scrollToBottom = () => {
+    if (mensajesEndRef.current) {
+      mensajesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -33,28 +43,21 @@ const Chat = () => {
     return () => unsubscribe();
   }, []);
 
-  // Cargar lista de clientes
   useEffect(() => {
     const obtenerClientes = async () => {
-      const clientesSnapshot = await getDocs(collection(db, 'cliente'));
-      const clientesData = clientesSnapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setClientes(clientesData);
+      const snapshot = await getDocs(collection(db, 'cliente'));
+      const datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setClientes(datos);
     };
-
     obtenerClientes();
   }, []);
 
   useEffect(() => {
     if (!clienteSeleccionado) return;
 
-    const idCliente = Number(clienteSeleccionado.clienteId);
-
     const q = query(
       collection(db, 'chat'),
-      where('clienteId', '==', idCliente)
+      where('clienteId', '==', Number(clienteSeleccionado.clienteId))
     );
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -64,7 +67,6 @@ const Chat = () => {
         const data = docSnap.data();
         mensajesData.push(data);
 
-        // Marcar como leído si el usuario actual no es el emisor
         if (data.emisorId !== emisorId && data.leido === false) {
           updateDoc(doc(db, 'chat', docSnap.id), { leido: true });
         }
@@ -78,12 +80,14 @@ const Chat = () => {
       setMensajes(mensajesData);
     });
 
-
     return () => unsubscribe();
   }, [clienteSeleccionado]);
 
+  // Scroll automático al cambiar los mensajes
+  useEffect(() => {
+    scrollToBottom();
+  }, [mensajes]);
 
-  // Enviar mensaje
   const enviarMensaje = async (e) => {
     e.preventDefault();
     if (!nuevoMensaje.trim() || !clienteSeleccionado) return;
@@ -94,32 +98,39 @@ const Chat = () => {
       emisorId,
       mensaje: nuevoMensaje,
       timestamp: serverTimestamp(),
-      leido: false 
+      leido: false
     });
 
     setNuevoMensaje('');
   };
 
+  const clientesFiltrados = clientes.filter(c =>
+    (`${c.nombre} ${c.apellido1}`).toLowerCase().includes(busqueda.toLowerCase())
+  );
+
   return (
-    <div style={{ display: 'flex', height: '100vh' }}>
-      {/* Lista de clientes */}
-      <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '16px', overflowY: 'auto' }}>
+    <div className="chat-container">
+      <div className="chat-clientes">
+        <button className="chat-volver-icono" onClick={() => navigate('/inicio')}>
+          ←
+        </button>
         <h3>Clientes</h3>
-        <ul style={{ listStyle: 'none', padding: 0 }}>
-          {clientes.map((cliente) => (
+        <div className="chat-buscador">
+          <input
+            type="text"
+            placeholder="Buscar cliente..."
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+          />
+        </div>
+        <ul>
+          {clientesFiltrados.map((cliente) => (
             <li
               key={cliente.clienteId}
-              onClick={() => setClienteSeleccionado({
-                ...cliente,
-                clienteId: Number(cliente.clienteId)
-              })}
-              style={{
-                padding: '10px',
-                marginBottom: '8px',
-                backgroundColor: clienteSeleccionado?.clienteId === Number(cliente.clienteId) ? '#e6f7ff' : '#f9f9f9',
-                borderRadius: '8px',
-                cursor: 'pointer'
-              }}
+              className={clienteSeleccionado?.clienteId === Number(cliente.clienteId) ? 'seleccionado' : ''}
+              onClick={() =>
+                setClienteSeleccionado({ ...cliente, clienteId: Number(cliente.clienteId) })
+              }
             >
               {cliente.nombre} {cliente.apellido1}
             </li>
@@ -127,59 +138,51 @@ const Chat = () => {
         </ul>
       </div>
 
-      {/* Chat */}
-      <div style={{ width: '70%', padding: '16px', display: 'flex', flexDirection: 'column' }}>
+      <div className="chat-mensajes-container">
         {clienteSeleccionado ? (
           <>
-            <h3>Chat con {clienteSeleccionado.nombre} {clienteSeleccionado.apellido1}</h3>
-            <div style={{ flexGrow: 1, overflowY: 'scroll', border: '1px solid #ccc', padding: '10px', marginBottom: '12px' }}>
+            <div className="chat-mensajes-titulo">
+              Chat con {clienteSeleccionado.nombre} {clienteSeleccionado.apellido1}
+            </div>
+            <div className="chat-mensajes">
               {mensajes.length > 0 ? (
                 mensajes.map((msg, idx) => (
-                  <div
-                    key={idx}
-                    style={{
-                      display: 'flex',
-                      justifyContent: msg.emisorId === emisorId ? 'flex-end' : 'flex-start',
-                      marginBottom: '8px'
-                    }}
-                  >
-                    <div
-                    style={{
-                      backgroundColor: msg.emisorId === emisorId ? '#DCF8C6' : '#F1F0F0',
-                      padding: '10px',
-                      borderRadius: '12px',
-                      maxWidth: '70%',
-                      position: 'relative'
-                    }}
-                  >
-                    <div>{msg.mensaje}</div>
-                    {msg.timestamp && (
-                      <div style={{ fontSize: '10px', color: '#555', textAlign: 'right', marginTop: '4px' }}>
-                        {new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    )}
-                  </div>
+                  <div key={idx} className={`chat-burbuja ${msg.emisorId === emisorId ? 'emisor' : ''}`}>
+                    <div className="chat-mensaje">
+                      <div>{msg.mensaje}</div>
+                      {msg.timestamp && (
+                        <div className="chat-hora">
+                          {new Date(msg.timestamp.seconds * 1000).toLocaleTimeString([], {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </div>
+                      )}
+                    </div>
                   </div>
                 ))
               ) : (
-                <p style={{ fontStyle: 'italic', color: '#888' }}>No hay mensajes aún.</p>
+                <p style={{ fontStyle: 'italic', color: '#888' }}>
+                  No hay mensajes aún.
+                </p>
               )}
+              <div ref={mensajesEndRef}></div>
             </div>
-            <form onSubmit={enviarMensaje} style={{ display: 'flex' }}>
+
+            <form onSubmit={enviarMensaje} className="chat-formulario">
               <input
                 type="text"
                 value={nuevoMensaje}
                 onChange={(e) => setNuevoMensaje(e.target.value)}
                 placeholder="Escribe un mensaje..."
-                style={{ flexGrow: 1, padding: '10px' }}
               />
-              <button type="submit" style={{ padding: '10px 20px' }}>
-                Enviar
-              </button>
+              <button type="submit">Enviar</button>
             </form>
           </>
         ) : (
-          <p style={{ fontStyle: 'italic', color: '#888' }}>Selecciona un cliente para comenzar a chatear.</p>
+          <p style={{ fontStyle: 'italic', color: '#888' }}>
+            Selecciona un cliente para comenzar a chatear.
+          </p>
         )}
       </div>
     </div>
