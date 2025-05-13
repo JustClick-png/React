@@ -6,6 +6,7 @@ import Login from './components/Login'; // Asegúrate de importar Login
 import Inicio from './components/Inicio'; // Importa el componente de inicio
 import Registro from './components/Registro'; // Importa el componente de inicio
 import Perfil from './components/Perfil'; // Importa el componente de inicio
+import Chat from './components/Chat'; // Asegúrate de que el path sea correcto
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/inicio" element={<Inicio />} /> {/* Ruta para la página de inicio */}
           <Route path="/registro" element={<Registro />} /> {/* Ruta para la página de registro */}
           <Route path="/perfil" element={<Perfil />} /> {/* Ruta para la página de perfil */}
+          <Route path="/chat" element={<Chat />} />
         </Routes>
       </div>
     </Router>

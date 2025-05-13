@@ -31,6 +31,9 @@ function Inicio() {
   const [error, setError] = useState('');
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nombreEmpresa, setNombreEmpresa] = useState('');
+  const [mensajesSinLeer, setMensajesSinLeer] = useState(0);
+
+
 
   const [nuevaReserva, setNuevaReserva] = useState({
     fecha: '',
@@ -48,7 +51,6 @@ function Inicio() {
         fecha: new Date(nuevaReserva.fecha + 'T' + nuevaReserva.hora),
         usuarioId: auth.currentUser.uid
       });
-      alert('Reserva creada correctamente');
       setMostrarFormulario(false);
       window.location.reload();
     } catch (err) {
@@ -149,7 +151,6 @@ function Inicio() {
       setError('Por favor, completa todos los campos.');
       return;
     }
-
     const templateParams = {
       from_name: nombre,
       from_email: correo,
@@ -159,7 +160,6 @@ function Inicio() {
     emailjs
       .send('service_4s1z1md', 'template_hsio978', templateParams, '-yuJvUuMfk_LqKgKI')
       .then(() => {
-        alert('Mensaje enviado correctamente');
         setNombre('');
         setCorreo('');
         setMensaje('');
@@ -199,6 +199,16 @@ function Inicio() {
           setReservas(reservasData);
           filtrarReservasPorFecha(new Date()); // Al cargar, muestra reservas del día actual
 
+          const mensajesQuery = query(
+            collection(db, "chat"),
+            where("usuarioId", "==", user.uid),
+            where("leido", "==", false)
+          );
+          const mensajesSnapshot = await getDocs(mensajesQuery);
+          const cantidad = mensajesSnapshot.size;
+          setMensajesSinLeer(cantidad);
+          console.log("📨 Mensajes sin leer:", cantidad);
+
           const clientesSnapshot = await getDocs(collection(db, "cliente"));
           const clientesData = clientesSnapshot.docs.map(doc => {
             const data = doc.data();
@@ -226,6 +236,45 @@ function Inicio() {
     return () => unsubscribe();
   }, []);
 
+  const handleEnviarRecordatorio = () => {
+    if (!reservaSeleccionada) return;
+
+    const cliente = clientes.find(c => c.clienteId === reservaSeleccionada.clienteId);
+    if (!cliente) {
+      alert("Cliente no encontrado.");
+      return;
+    }
+
+    const fecha = reservaSeleccionada.fecha.toLocaleDateString('es-ES');
+    const hora = reservaSeleccionada.hora;
+
+    const templateParams = {
+      to_email: cliente.correo,                         // este es el destino
+      cliente_nombre: `${cliente.nombre} ${cliente.apellido1}`,
+      fecha,
+      hora,
+      peluqueria: nombreEmpresa
+    };
+
+    console.log("📤 Datos que se van a enviar:", {
+      to_email: cliente.correo,
+      cliente_nombre: `${cliente.nombre} ${cliente.apellido1}`,
+      fecha,
+      hora,
+      peluqueria: nombreEmpresa
+    });
+
+    emailjs
+      .send('service_4s1z1md', 'template_4ervcwv', templateParams, '-yuJvUuMfk_LqKgKI')
+      .then(() => {
+      })
+      .catch((error) => {
+        console.error('❌ Error enviando recordatorio:', error);
+      });
+  };
+
+
+
   return (
     <div className="inicio">
       {/* NAV */}
@@ -236,6 +285,9 @@ function Inicio() {
             <a href="#calendario">Calendario</a>
             <a href="#lista">Lista</a>
             <a href="#estadisticas">Estadísticas</a>
+            <button onClick={() => navigate('/chat')} className="chat-btn">
+              💬 Chat {mensajesSinLeer > 0 && <span className="chat-badge">{mensajesSinLeer}</span>}
+            </button>
           </div>
           <div className="perfil-img">
             <img onClick={handleChangePerfil} className="perfil-img" src={perfil} alt="Perfil" />
@@ -337,7 +389,12 @@ function Inicio() {
                 if (cliente) {
                   return (
                     <>
-                      <p><strong>Cliente:</strong> {cliente.nombre} {cliente.apellido1} {cliente.apellido2}</p>
+                      <p>
+                        <strong>Cliente:</strong> 
+                        {cliente.nombre || ''} 
+                        {cliente.apellido1 ? ` ${cliente.apellido1}` : ''} 
+                        {cliente.apellido2 ? ` ${cliente.apellido2}` : ''}
+                      </p>
                       <p><strong>Teléfono:</strong> {cliente.telefono}</p>
                       <p><strong>Correo:</strong> {cliente.correo}</p>
                     </>
@@ -355,6 +412,21 @@ function Inicio() {
                 <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Completada')}>
                   Completada
                 </button>
+                <button
+                  onClick={handleEnviarRecordatorio}
+                  style={{
+                    backgroundColor: '#ffc107',
+                    color: 'white',
+                    padding: '8px',
+                    marginTop: '10px',
+                    border: 'none',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    marginBottom: '-10px',
+                  }}
+                >
+                  Avisar
+                </button>
               </div>
               <button onClick={() => setMostrarModal(false)}>Cerrar</button>
             </div>
@@ -369,7 +441,7 @@ function Inicio() {
             <form onSubmit={guardarNuevaReserva} className="formulario-reserva">
               <input type="date" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, fecha: e.target.value })} />
               <input type="time" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, hora: e.target.value })} />
-              <select required onChange={(e) => setNuevaReserva({ ...nuevaReserva, clienteId: e.target.value })}>
+              <select required onChange={(e) => setNuevaReserva({ ...nuevaReserva, clienteId: Number(e.target.value) })}>
                 <option value="">Selecciona cliente</option>
                 {clientes.map((cli, idx) => (
                   <option key={idx} value={cli.clienteId}>{cli.nombre} {cli.apellido1}</option>
