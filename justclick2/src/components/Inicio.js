@@ -31,7 +31,7 @@ function Inicio() {
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [nombreEmpresa, setNombreEmpresa] = useState('');
   const [mensajesSinLeer, setMensajesSinLeer] = useState(0);
-
+  const [menuAbierto, setMenuAbierto] = useState(false);
 
 
   const [nuevaReserva, setNuevaReserva] = useState({
@@ -284,24 +284,37 @@ function Inicio() {
       {/* NAV */}
       <div className="nav-menu">
         <div className="container">
+          {/* Logo */}
           <img src={logo} alt="Logo" className="logo" />
-          <div className="nav-links">
-            <a href="#calendario">Calendario</a>
-            <a href="#reservas">Reservas</a>
-            <a href="#resumen">Resumen</a>
-            <button onClick={() => navigate('/chat')} className="chat-btn" style={{ position: 'relative', background: 'none', border: 'none' }}>
-              <img src={chatIcon} alt="Chat" style={{ width: '40px', height: '40px' }} />
+
+          {/* Botón menú hamburguesa (solo visible en móviles) */}
+          <button className="menu-toggle" onClick={() => setMenuAbierto(!menuAbierto)}>
+            ☰
+          </button>
+
+          {/* Enlaces de navegación */}
+          <div className={`nav-links ${menuAbierto ? 'activo' : ''}`}>
+            <a href="#calendario" onClick={() => setMenuAbierto(false)}>Calendario</a>
+            <a href="#reservas" onClick={() => setMenuAbierto(false)}>Reservas</a>
+            <a href="#resumen" onClick={() => setMenuAbierto(false)}>Resumen</a>
+            <button
+              onClick={() => {
+                navigate('/chat');
+                setMenuAbierto(false);
+              }}
+              className="chat-btn"
+              style={{ position: 'relative', background: 'none', border: 'none' }}
+            >
+              <img src={chatIcon} alt="Chat" style={{ width: '30px', height: '30px' }} />
               {mensajesSinLeer > 0 && (
-                <span className="chat-badge" style={{
-                  position: 'absolute',
-                  top: '-6px',
-                  right: '-6px'
-                }}>
+                <span className="chat-badge" style={{ position: 'absolute', top: '-6px', right: '-6px' }}>
                   {mensajesSinLeer}
                 </span>
               )}
             </button>
           </div>
+
+          {/* Imagen de perfil */}
           <div className="perfil-img">
             <img onClick={handleChangePerfil} className="perfil-img" src={perfil} alt="Perfil" />
           </div>
