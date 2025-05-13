@@ -854,3 +854,77 @@ h4 {
     font-size: 16px;
   }
 }
+
+@media (max-width: 768px) {
+  .nav-menu .container {
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 10px;
+    border-bottom: none;
+  }
+
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .nav-menu .logo {
+    width: 120px;
+  }
+
+  .perfil-img {
+    margin-top: 10px;
+  }
+
+  .fondo-imagen {
+    height: auto;
+    margin-top: 0;
+  }
+
+  .texto-sobre-imagen {
+    position: static;
+    transform: none;
+    padding: 10px;
+    max-width: 100%;
+    text-align: center;
+  }
+
+  .texto-sobre-imagen .titulo,
+  .texto-sobre-imagen .descripcion,
+  .saludo {
+    margin-left: 0;
+  }
+
+  .section-container {
+    width: 90%;
+  }
+
+  .resumen-estadisticas {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .contacto-container {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .contacto-formulario {
+    padding-right: 0;
+    border-right: none;
+    margin-bottom: 20px;
+  }
+
+  .contacto-info {
+    padding-left: 0;
+    margin-top: 0;
+    align-items: center;
+  }
+
+  .chat-btn img {
+    width: 32px;
+    height: 32px;
+  }
+}
