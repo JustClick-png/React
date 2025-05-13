@@ -732,3 +732,125 @@ h4 {
   border-radius: 50%;
   margin-left: 6px;
 }
+
+/* ----------------------- */
+/* 🎯 RESPONSIVE QUERIES */
+/* ----------------------- */
+
+@media (max-width: 1024px) {
+  .section-container {
+    width: 80%;
+  }
+
+  .texto-sobre-imagen .titulo,
+  .texto-sobre-imagen .descripcion,
+  .saludo {
+    margin-left: 80px;
+  }
+}
+
+@media (max-width: 768px) {
+  .nav-menu .container {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .nav-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .nav-menu .logo {
+    width: 120px;
+  }
+
+  .texto-sobre-imagen .titulo,
+  .texto-sobre-imagen .descripcion,
+  .saludo {
+    margin-left: 40px;
+  }
+
+  .texto-sobre-imagen {
+    max-width: 95%;
+    font-size: 1rem;
+  }
+
+  .section-container {
+    width: 90%;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contacto-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .contacto-formulario {
+    padding-right: 0;
+    border-right: none;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 20px;
+  }
+
+  .contacto-info {
+    padding-left: 0;
+    margin-top: 0;
+  }
+
+  .chat-btn {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .texto-sobre-imagen .titulo {
+    font-size: 1.4rem;
+  }
+
+  .texto-sobre-imagen .descripcion,
+  .saludo {
+    font-size: 1rem;
+  }
+
+  .react-calendar {
+    padding: 5px;
+  }
+
+  .resumen-estadisticas {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .formulario-reserva {
+    gap: 10px;
+  }
+
+  .crear-reserva-btn,
+  .formulario-reserva button[type="submit"] {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  .chat-btn {
+    padding: 6px 12px;
+  }
+
+  .chat-badge {
+    font-size: 10px;
+    top: -4px;
+    right: -8px;
+  }
+
+  .scroll-to-top {
+    width: 40px;
+    height: 40px;
+    font-size: 16px;
+  }
+}
