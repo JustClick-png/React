@@ -281,41 +281,27 @@ function Inicio() {
       {/* NAV */}
       <div className="nav-menu">
         <div className="container">
-          {/* Logo */}
-          <img src={logo} alt="Logo" className="logo" />
+          <div className="nav-left">
+            <img src={logo} alt="Logo" className="logo" />
+          </div>
 
-          {/* Enlaces (solo visibles en escritorio/tablet) */}
           <div className="nav-links">
             <a href="#calendario">Calendario</a>
             <a href="#reservas">Reservas</a>
             <a href="#resumen">Resumen</a>
           </div>
 
-          {/* Botón de chat (siempre visible) */}
-          <button
-            onClick={() => navigate('/chat')}
-            className="chat-btn"
-            style={{ background: 'none', border: 'none' }}
-          >
-            <img src={chatIcon} alt="Chat" style={{ width: '30px', height: '30px' }} />
-            {mensajesSinLeer > 0 && (
-              <span className="chat-badge" style={{
-                position: 'absolute',
-                top: '-6px',
-                right: '-6px'
-              }}>
-                {mensajesSinLeer}
-              </span>
-            )}
-          </button>
-
-          {/* Perfil (siempre visible) */}
-          <div className="perfil-img">
-            <img onClick={handleChangePerfil} className="perfil-img" src={perfil} alt="Perfil" />
+          <div className="nav-right">
+            <button onClick={() => navigate('/chat')} className="chat-btn">
+              <img src={chatIcon} alt="Chat" />
+              {mensajesSinLeer > 0 && <span className="chat-badge">{mensajesSinLeer}</span>}
+            </button>
+            <div className="perfil-img" onClick={handleChangePerfil}>
+              <img src={perfil} alt="Perfil" />
+            </div>
           </div>
         </div>
       </div>
-
 
       {/* HEADER */}
       <div className="fondo-imagen" style={{ backgroundImage: `url(${fondoImage})` }}>

@@ -37,8 +37,31 @@ html {
   z-index: 10;
 }
 
+/* Tamaño uniforme para logo, perfil y chat */
+.logo,
+.perfil-img img,
+.chat-btn img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+}
+
+.perfil-img  img{
+  margin-top: 10px;
+}
+
+/* Asegurar que estén alineados */
+.nav-left,
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .nav-menu .container {
-  width: 80%; 
+  max-width: 1100px;
+  width: 90%;
+  padding: 10px 0;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
@@ -46,11 +69,12 @@ html {
   border-bottom: 2px solid black ; 
 }
 
+
 .nav-menu a {
   color: black;
-  font-size: 1rem;
+  font-size: 0.95rem;
   text-decoration: none;
-  padding: 10px;
+  padding: 8px;
   text-transform: capitalize;
   transition: color 0.3s;
   font-weight: bold;
@@ -62,19 +86,8 @@ html {
 
 .nav-links {
   display: flex;
-  gap: 20px; 
-}
-
-.nav-menu .logo {
-  width: 150px;
-  height: auto;
-}
-
-.nav-menu .perfil-img {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  cursor: pointer;
+  gap: 12px; /* Antes era 20px */
+  align-items: center;
 }
 
 .background-image {
@@ -699,7 +712,7 @@ h4 {
 }
 
 .chat-btn {
-  background-color: #007bff;
+  background-color: transparent;
   color: white;
   border: none;
   padding: 8px 14px;
@@ -710,10 +723,6 @@ h4 {
   position: relative;
   display: flex;
   align-items: center;
-}
-
-.chat-btn:hover {
-  background-color: #0056b3;
 }
 
 .chat-badge {
@@ -757,10 +766,6 @@ h4 {
     padding: 10px;
   }
 
-  .nav-menu .logo {
-    width: 120px;
-  }
-
   .texto-sobre-imagen .titulo,
   .texto-sobre-imagen .descripcion,
   .saludo {
@@ -797,11 +802,6 @@ h4 {
     padding-left: 0;
     margin-top: 0;
   }
-
-  .chat-btn {
-    margin-left: 0;
-    margin-top: 10px;
-  }
 }
 
 @media (max-width: 480px) {
@@ -833,10 +833,6 @@ h4 {
     padding: 10px;
   }
 
-  .chat-btn {
-    padding: 6px 12px;
-  }
-
   .chat-badge {
     font-size: 10px;
     top: -4px;
@@ -851,22 +847,6 @@ h4 {
 }
 
 @media (max-width: 768px) {
-  .nav-menu .container {
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding: 10px;
-    border-bottom: none;
-  }
-
-  .nav-menu .logo {
-    width: 120px;
-  }
-
-  .perfil-img {
-    margin-top: 10px;
-  }
-
   .fondo-imagen {
     height: auto;
     margin-top: 0;
@@ -910,71 +890,5 @@ h4 {
     padding-left: 0;
     margin-top: 0;
     align-items: center;
-  }
-
-  .chat-btn img {
-    width: 32px;
-    height: 32px;
-  }
-}
-
-
-@media (max-width: 768px) {
-  .perfil-img {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .chat-btn {
-    display: block;
-    margin-left: 10px;
-  }
-
-  .perfil-img {
-    display: block;
-  }
-
-}
-
-@media (max-width: 768px) {
-  .nav-menu .container {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    width: 100%;
-  }
-
-  .nav-menu .logo {
-    width: 50px;
-    height: 50px;
-  }
-
-  .perfil-img img,
-  .chat-btn img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .chat-btn {
-    background: none;
-    padding: 0;
-    margin-left: 0;
-  }
-
-  .perfil-img {
-    margin-left: 10px;
-  }
-
-  .nav-menu .container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .nav-menu {
-    padding: 0 10px;
   }
 }
