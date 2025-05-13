@@ -23,6 +23,7 @@ const Chat = () => {
   const [usuarioId, setUsuarioId] = useState('');
   const [emisorId, setEmisorId] = useState('');
   const [busqueda, setBusqueda] = useState('');
+  const [clientesConReserva, setClientesConReserva] = useState([]);
   const navigate = useNavigate();
   const mensajesEndRef = useRef(null);
 
@@ -32,6 +33,7 @@ const Chat = () => {
     }
   };
 
+  // Detectar usuario autenticado
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -39,10 +41,10 @@ const Chat = () => {
         setEmisorId(user.uid);
       }
     });
-
     return () => unsubscribe();
   }, []);
 
+  // Obtener clientes desde Firestore
   useEffect(() => {
     const obtenerClientes = async () => {
       const snapshot = await getDocs(collection(db, 'cliente'));
@@ -52,6 +54,22 @@ const Chat = () => {
     obtenerClientes();
   }, []);
 
+  // Obtener clientes que tienen reserva con esta peluquería
+  useEffect(() => {
+    const obtenerClientesConReserva = async () => {
+      if (!usuarioId) return;
+
+      const reservasSnapshot = await getDocs(
+        query(collection(db, 'reservas'), where('usuarioId', '==', usuarioId))
+      );
+      const clienteIds = reservasSnapshot.docs.map(doc => doc.data().clienteId);
+      setClientesConReserva([...new Set(clienteIds)]);
+    };
+
+    obtenerClientesConReserva();
+  }, [usuarioId]);
+
+  // Escuchar mensajes del cliente seleccionado
   useEffect(() => {
     if (!clienteSeleccionado) return;
 
@@ -67,6 +85,7 @@ const Chat = () => {
         const data = docSnap.data();
         mensajesData.push(data);
 
+        // Marcar como leído si no soy el emisor
         if (data.emisorId !== emisorId && data.leido === false) {
           updateDoc(doc(db, 'chat', docSnap.id), { leido: true });
         }
@@ -78,15 +97,11 @@ const Chat = () => {
       });
 
       setMensajes(mensajesData);
+      setTimeout(scrollToBottom, 100); // Garantizar scroll al fondo tras renderizado
     });
 
     return () => unsubscribe();
   }, [clienteSeleccionado]);
-
-  // Scroll automático al cambiar los mensajes
-  useEffect(() => {
-    scrollToBottom();
-  }, [mensajes]);
 
   const enviarMensaje = async (e) => {
     e.preventDefault();
@@ -104,16 +119,16 @@ const Chat = () => {
     setNuevoMensaje('');
   };
 
-  const clientesFiltrados = clientes.filter(c =>
-    (`${c.nombre} ${c.apellido1}`).toLowerCase().includes(busqueda.toLowerCase())
-  );
+  const clientesFiltrados = clientes
+    .filter(c => clientesConReserva.includes(c.clienteId))
+    .filter(c =>
+      (`${c.nombre} ${c.apellido1}`).toLowerCase().includes(busqueda.toLowerCase())
+    );
 
   return (
     <div className="chat-container">
       <div className="chat-clientes">
-        <button className="chat-volver-icono" onClick={() => navigate('/inicio')}>
-          ←
-        </button>
+        <button className="chat-volver-icono" onClick={() => navigate('/inicio')}>←</button>
         <h3>Clientes</h3>
         <div className="chat-buscador">
           <input

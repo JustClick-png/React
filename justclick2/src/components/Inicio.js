@@ -287,8 +287,8 @@ function Inicio() {
           <img src={logo} alt="Logo" className="logo" />
           <div className="nav-links">
             <a href="#calendario">Calendario</a>
-            <a href="#lista">Lista</a>
-            <a href="#estadisticas">Estadísticas</a>
+            <a href="#reservas">Reservas</a>
+            <a href="#resumen">Resumen</a>
             <button onClick={() => navigate('/chat')} className="chat-btn" style={{ position: 'relative', background: 'none', border: 'none' }}>
               <img src={chatIcon} alt="Chat" style={{ width: '40px', height: '40px' }} />
               {mensajesSinLeer > 0 && (
@@ -516,8 +516,7 @@ function Inicio() {
         <div className="footer-bottom">
           <p>&copy; 2025 JuegAlmi - Todos los derechos reservados.</p>
         </div>
-      </footer>
-
+      </footer> 
       <button className="scroll-to-top" onClick={() => window.scrollTo(0, 0)}>↑</button>
     </div>
   );
