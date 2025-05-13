@@ -975,3 +975,53 @@ h4 {
     margin: 10px 0;
   }
 }
+
+/* Estilo base (oculto en móviles) */
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    background-color: white;
+    position: absolute;
+    top: 80px;
+    left: 0;
+    width: 100%;
+    padding: 20px;
+    z-index: 100;
+    box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+    text-align: left;
+  }
+
+  .nav-links.activo {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: block;
+    background: none;
+    border: none;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 101;
+  }
+
+  .perfil-img {
+    display: none;
+  }
+}
+
+/* Mostrar el toggle solo en móvil */
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+}

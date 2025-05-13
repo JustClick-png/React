@@ -209,9 +209,6 @@ function Inicio() {
           const mensajesNoLeidosParaMi = mensajesSnapshot.docs.filter(doc => doc.data().emisorId !== user.uid);
 
           setMensajesSinLeer(mensajesNoLeidosParaMi.length);
-          console.log("Mensajes no leídos para mí:", mensajesNoLeidosParaMi.length);
-
-
 
           const clientesSnapshot = await getDocs(collection(db, "cliente"));
           const clientesData = clientesSnapshot.docs.map(doc => {
@@ -293,7 +290,7 @@ function Inicio() {
           </button>
 
           {/* Enlaces de navegación */}
-          <div className={`nav-links ${menuAbierto ? 'activo' : ''}`}>
+            <div className={`nav-links ${menuAbierto ? 'activo' : 'cerrado'}`}>
             <a href="#calendario" onClick={() => setMenuAbierto(false)}>Calendario</a>
             <a href="#reservas" onClick={() => setMenuAbierto(false)}>Reservas</a>
             <a href="#resumen" onClick={() => setMenuAbierto(false)}>Resumen</a>
