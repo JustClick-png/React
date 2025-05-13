@@ -284,39 +284,38 @@ function Inicio() {
           {/* Logo */}
           <img src={logo} alt="Logo" className="logo" />
 
-          {/* Botón menú hamburguesa (solo visible en móviles) */}
-          <button className="menu-toggle" onClick={() => setMenuAbierto(!menuAbierto)}>
-            ☰
-          </button>
-
-          {/* Enlaces de navegación */}
-            <div className={`nav-links ${menuAbierto ? 'activo' : 'cerrado'}`}>
-            <a href="#calendario" onClick={() => setMenuAbierto(false)}>Calendario</a>
-            <a href="#reservas" onClick={() => setMenuAbierto(false)}>Reservas</a>
-            <a href="#resumen" onClick={() => setMenuAbierto(false)}>Resumen</a>
-            <button
-              onClick={() => {
-                navigate('/chat');
-                setMenuAbierto(false);
-              }}
-              className="chat-btn"
-              style={{ position: 'relative', background: 'none', border: 'none' }}
-            >
-              <img src={chatIcon} alt="Chat" style={{ width: '30px', height: '30px' }} />
-              {mensajesSinLeer > 0 && (
-                <span className="chat-badge" style={{ position: 'absolute', top: '-6px', right: '-6px' }}>
-                  {mensajesSinLeer}
-                </span>
-              )}
-            </button>
+          {/* Enlaces (solo visibles en escritorio/tablet) */}
+          <div className="nav-links">
+            <a href="#calendario">Calendario</a>
+            <a href="#reservas">Reservas</a>
+            <a href="#resumen">Resumen</a>
           </div>
 
-          {/* Imagen de perfil */}
+          {/* Botón de chat (siempre visible) */}
+          <button
+            onClick={() => navigate('/chat')}
+            className="chat-btn"
+            style={{ background: 'none', border: 'none' }}
+          >
+            <img src={chatIcon} alt="Chat" style={{ width: '30px', height: '30px' }} />
+            {mensajesSinLeer > 0 && (
+              <span className="chat-badge" style={{
+                position: 'absolute',
+                top: '-6px',
+                right: '-6px'
+              }}>
+                {mensajesSinLeer}
+              </span>
+            )}
+          </button>
+
+          {/* Perfil (siempre visible) */}
           <div className="perfil-img">
             <img onClick={handleChangePerfil} className="perfil-img" src={perfil} alt="Perfil" />
           </div>
         </div>
       </div>
+
 
       {/* HEADER */}
       <div className="fondo-imagen" style={{ backgroundImage: `url(${fondoImage})` }}>
