@@ -156,7 +156,7 @@
   .chat-container {
     flex-direction: row;
     flex-wrap: nowrap;
-    height: 100vh;
+    height: 80vh;
     overflow: hidden;
   }
 
