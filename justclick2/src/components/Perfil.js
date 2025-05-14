@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { doc, updateDoc, setDoc, getDoc } from 'firebase/firestore'; // <-- añadido setDoc y getDoc
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import 'leaflet/dist/leaflet.css';
 import '../css/Perfil.css';
 import ubiIcon from '../fotos/ubi.png';
@@ -13,38 +13,84 @@ import instaLogo from '../fotos/isnta.png';
 import { useNavigate } from 'react-router-dom';
 import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { getAuth } from 'firebase/auth';
+import { deleteObject } from "firebase/storage";
 
 const Perfil = () => {
   const [usuarioData, setUsuarioData] = useState(null);
   const [ubicacion, setUbicacion] = useState({ lat: 40.4168, lng: -3.7038 });
   const [showModal, setShowModal] = useState(false);
-  const [descripcion, setDescripcion] = useState("");
-  const [foto, setFoto] = useState(null);
+  const [fotos, setFotos] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedUser = localStorage.getItem("userData");
+  const [empresaForm, setEmpresaForm] = useState({
+    nombre: '',
+    propietario: '',
+    telefono: '',
+    correo: '',
+    descripcion: ''
+  });
 
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUsuarioData(userData);
-      setUbicacion(userData.ubicacion || ubicacion);
+  const handleDeleteFoto = async (url) => {
+  const confirmDelete = window.confirm("¿Estás seguro de que quieres eliminar esta foto?");
+    if (!confirmDelete) return;
+
+    try {
+      // Obtener la referencia del archivo en Storage
+      const pathStart = url.indexOf("/o/") + 3;
+      const pathEnd = url.indexOf("?alt=");
+      const path = decodeURIComponent(url.substring(pathStart, pathEnd));
+      const fotoRef = ref(storage, path);
+
+      // Eliminar de Firebase Storage
+      await deleteObject(fotoRef);
+
+      // Eliminar de Firestore
+      const auth = getAuth();
+      const user = auth.currentUser;
+      const empresaRef = doc(db, 'empresa', user.uid);
+      const nuevasFotos = usuarioData.fotos.filter(f => f !== url);
+      await updateDoc(empresaRef, { fotos: nuevasFotos });
+
+      // Actualizar estado local
+      setUsuarioData(prev => ({
+        ...prev,
+        fotos: nuevasFotos
+      }));
+
+    } catch (error) {
+      console.error("Error al eliminar la foto:", error);
+      alert("Hubo un error al eliminar la foto.");
     }
-  }, []);
+  };
 
   useEffect(() => {
     const auth = getAuth();
-    const user = auth.currentUser;
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        const empresaRef = doc(db, "empresa", user.uid);
+        const empresaSnap = await getDoc(empresaRef);
 
-    if (!user) {
-      navigate("/");
-    }
+        if (empresaSnap.exists()) {
+          const empresaData = empresaSnap.data();
+          setUsuarioData({ ...empresaData, usuarioId: user.uid });
+          setEmpresaForm({
+            nombre: empresaData.nombre || '',
+            propietario: empresaData.propietario || '',
+            telefono: empresaData.telefono || '',
+            correo: empresaData.correo || '',
+            descripcion: empresaData.descripcion || ''
+          });
+          setUbicacion(empresaData.ubicacion || ubicacion);
+        } else {
+          console.error("No se encontró empresa para este usuario.");
+        }
+      } else {
+        navigate("/");
+      }
+    });
+    return () => unsubscribe();
   }, [navigate]);
-
-  if (!usuarioData) {
-    return <p>Cargando o no hay datos de usuario...</p>;
-  }
 
   const icon = new L.Icon({
     iconUrl: ubiIcon,
@@ -54,87 +100,83 @@ const Perfil = () => {
   });
 
   const handleFileChange = (e) => {
-    setFoto(e.target.files[0]);
+    setFotos(Array.from(e.target.files));
   };
 
-  const inicio = () => {
-    navigate("/inicio");
+  const obtenerUbicacion = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setUbicacion({ lat: latitude, lng: longitude });
+        },
+        () => alert("No se pudo obtener la ubicación actual.")
+      );
+    } else {
+      alert("Geolocalización no disponible en tu navegador.");
+    }
   };
 
   const handleSubmitInfo = async () => {
     setLoading(true);
-    console.log("Iniciando actualización...");
-    console.log("usuarioId:", usuarioData.usuarioId);
-    console.log("Descripción a guardar:", descripcion);
-    console.log("Foto seleccionada:", foto);
-
     try {
-      let fotoUrl = usuarioData.foto;
-
-      if (foto) {
-        const fotoRef = ref(storage, `fotos/${foto.name}`);
-        await uploadBytes(fotoRef, foto);
-        fotoUrl = await getDownloadURL(fotoRef);
-        console.log("Foto subida con éxito:", fotoUrl);
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (!user) {
+        navigate("/");
+        return;
       }
 
-      const empresaRef = doc(db, 'empresa', usuarioData.usuarioId);
-      const empresaSnap = await getDoc(empresaRef);
+      let fotosUrls = usuarioData.fotos ? [...usuarioData.fotos] : [];
 
-      if (!empresaSnap.exists()) {
-        // Si NO existe, lo creamos
-        console.log("Perfil no existía, creando uno nuevo...");
-        await setDoc(empresaRef, {
-          descripcion,
-          foto: fotoUrl,
-        });
-      } else {
-        // Si existe, actualizamos
-        console.log("Perfil encontrado, actualizando...");
-        await updateDoc(empresaRef, {
-          descripcion,
-          foto: fotoUrl,
-        });
+      if (fotos.length > 0) {
+        for (const file of fotos) {
+          const fotoRef = ref(storage, `fotos/${file.name}`);
+          await uploadBytes(fotoRef, file);
+          const url = await getDownloadURL(fotoRef);
+          fotosUrls.push(url);
+        }
       }
 
-      setUsuarioData((prevData) => ({
-        ...prevData,
-        descripcion,
-        foto: fotoUrl,
+
+      const empresaRef = doc(db, 'empresa', user.uid);
+      await updateDoc(empresaRef, {
+        ...empresaForm,
+        fotos: fotosUrls,
+        ubicacion
+      });
+
+      setUsuarioData(prev => ({
+        ...prev,
+        ...empresaForm,
+        fotos: fotosUrls,
+        ubicacion
       }));
 
-      alert("¡Información actualizada!");
       setShowModal(false);
     } catch (error) {
       console.error("Error al actualizar la información:", error);
-      alert(`Error: ${error.message}`);
     }
-
     setLoading(false);
   };
 
   const handleLogout = () => {
     const auth = getAuth();
     auth.signOut().then(() => {
-      localStorage.removeItem("userUID");
-      localStorage.removeItem("userData");
+      localStorage.clear();
       navigate("/");
-    }).catch((error) => {
-      console.error("Error al cerrar sesión:", error);
-    });
+    }).catch(console.error);
   };
+
+  if (!usuarioData) return <p>Cargando...</p>;
 
   return (
     <div className="perfil-container">
       <div className="nav-menu">
         <div className="container">
           <img src={logo} alt="Logo" className="logo" />
-          <div className="nav-links">
-            <a onClick={inicio}>Inicio</a>
-          </div>
-          <div className="perfil-img">
-            <img className="perfil-img" src={perfil} alt="Perfil" />
-          </div>
+          <div className="nav-links"><a onClick={() => navigate("/inicio")}>Inicio</a></div>
+          <div className="perfil-img"><img className="perfil-img" src={perfil} alt="Perfil" /></div>
         </div>
       </div>
 
@@ -142,42 +184,74 @@ const Perfil = () => {
         <div className="perfil-info">
           <h2>{usuarioData.nombre}</h2>
           <p><strong>Propietario:</strong> {usuarioData.propietario || "No disponible"}</p>
-          <p><strong>Teléfono:</strong> {usuarioData.telefono || "Teléfono no disponible"}</p>
-          <p><strong>Email:</strong> {usuarioData.correo || "Email no disponible"}</p>
+          <p><strong>Teléfono:</strong> {usuarioData.telefono || "No disponible"}</p>
+          <p><strong>Email:</strong> {usuarioData.correo || "No disponible"}</p>
           <p><strong>Descripción:</strong> {usuarioData.descripcion || "No disponible"}</p>
-          {usuarioData.foto && <img src={usuarioData.foto} alt="Foto de la peluquería" />}
-          <button className="button-info" onClick={() => setShowModal(true)}>Añadir Información</button>
+          {usuarioData.fotos && usuarioData.fotos.map((url, i) => (
+            <div key={i} className="foto-empresa-wrapper">
+              <img src={url} alt={`foto${i}`} className="foto-empresa" />
+              <button
+                className="delete-icon"
+                onClick={() => handleDeleteFoto(url)}
+                title="Eliminar foto"
+              >
+                🗑
+              </button>
+            </div>
+          ))}
+          <button className="button-info" onClick={() => setShowModal(true)}>Editar Información</button>
         </div>
 
-        <div className="perfil-map">
-          <MapContainer center={ubicacion} zoom={16} style={{ width: '100%', height: '300px' }}>
-            <TileLayer
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            />
-            <Marker position={ubicacion} icon={icon}>
-              <Popup>{usuarioData.nombre}</Popup>
-            </Marker>
-          </MapContainer>
-        </div>
+        {!showModal && (
+          <div className="perfil-map">
+            <MapContainer center={ubicacion} zoom={16} scrollWheelZoom={false} zoomControl={false} style={{ width: '100%', height: '300px' }}>
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              />
+              <Marker position={ubicacion} icon={icon}>
+                <Popup>{usuarioData.nombre}</Popup>
+              </Marker>
+            </MapContainer>
+          </div>
+        )}
       </div>
 
       <button className="button-logout" onClick={handleLogout}>Cerrar sesión</button>
 
       {showModal && (
         <div className="modal">
-          <div className="modal-content">
-            <h3>Añadir Información</h3>
-            <textarea
-              placeholder="Añadir descripción"
-              value={descripcion}
-              onChange={(e) => setDescripcion(e.target.value)}
-            />
-            <input type="file" onChange={handleFileChange} />
+          <div className="modal-content modal-wide">
+            <h3>Editar Información</h3>
+
+            <label>Nombre:</label>
+            <input type="text" value={empresaForm.nombre} onChange={(e) => setEmpresaForm({ ...empresaForm, nombre: e.target.value })} />
+
+            <label>Propietario:</label>
+            <input type="text" value={empresaForm.propietario} onChange={(e) => setEmpresaForm({ ...empresaForm, propietario: e.target.value })} />
+
+            <label>Teléfono:</label>
+            <input type="text" value={empresaForm.telefono} onChange={(e) => setEmpresaForm({ ...empresaForm, telefono: e.target.value })} />
+
+            <label>Correo electrónico:</label>
+            <input type="email" value={empresaForm.correo} onChange={(e) => setEmpresaForm({ ...empresaForm, correo: e.target.value })} />
+
+            <label>Descripción:</label>
+            <textarea value={empresaForm.descripcion} onChange={(e) => setEmpresaForm({ ...empresaForm, descripcion: e.target.value })} />
+
+            <div className="ubicacion-section">
+              <p><strong>Ubicación actual:</strong></p>
+              <p>Lat: {ubicacion.lat.toFixed(5)} | Lng: {ubicacion.lng.toFixed(5)}</p>
+              <button className="button-info" onClick={obtenerUbicacion}>Obtener ubicación actual</button>
+            </div>
+
+            <label>Subir nuevas fotos:</label>
+            <input type="file" multiple onChange={handleFileChange} />
+
             <button className="button-info" onClick={handleSubmitInfo} disabled={loading}>
-              {loading ? "Cargando..." : "Guardar Información"}
+              {loading ? "Guardando..." : "Guardar Cambios"}
             </button>
-            <button className="button-info" onClick={() => setShowModal(false)}>Cerrar</button>
+            <button className="button-info-cerrar" onClick={() => setShowModal(false)}>Cerrar</button>
           </div>
         </div>
       )}
@@ -197,14 +271,6 @@ const Perfil = () => {
             <a href="https://www.instagram.com/justclick_oficial/" target="_blank" rel="noopener noreferrer">
               <img src={instaLogo} alt="Instagram" className="instagram-logo" />
             </a>
-          </div>
-          <div className="footer-links">
-            <h4>Enlaces útiles</h4>
-            <ul>
-              <li><a href="https://www.protocolo.com/politica-privacidad/">Política de Privacidad</a></li>
-              <li><a href="https://es.wikipedia.org/wiki/T%C3%A9rminos_y_condiciones_de_uso">Términos y Condiciones</a></li>
-              <li><a href="https://www.zendesk.es/service/help-center/faq-software/">FAQ</a></li>
-            </ul>
           </div>
         </div>
         <div className="footer-bottom">

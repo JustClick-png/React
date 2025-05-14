@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/firebaseConfig";
 import { createUserWithEmailAndPassword } from "firebase/auth"; 
-import { collection, addDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
 import "../css/Registro.css";
 import logo from "../fotos/logo.png";
 
@@ -43,7 +43,7 @@ const Registro = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, correo, password);
       const user = userCredential.user;
 
-      const docRef = await addDoc(collection(db, "empresa"), {
+      await setDoc(doc(db, "empresa", user.uid), {
         nombre,
         propietario,
         telefono,
@@ -52,7 +52,7 @@ const Registro = () => {
         usuarioId: user.uid,
       });
 
-      console.log("ID generado por Firebase:", docRef.id);
+      console.log("Empresa registrada con éxito.");
 
       navigate("/inicio");
     } catch (err) {

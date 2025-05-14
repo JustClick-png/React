@@ -48,31 +48,10 @@
     border-radius: 10px;
     overflow: hidden;
   }
-  
-  .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000; 
-}
 
 .perfil-container {
     z-index: 1; 
 }
-
-  
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    width: 300px;
-  }
   
   textarea {
     width: 100%;
@@ -345,4 +324,183 @@ h4 {
     width: 80%;
     font-size: 14px;
   }
+}
+
+.foto-empresa {
+  width: 120px;
+  height: auto;
+  margin: 5px;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 30px 40px;
+  width: 550px;
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  text-align: left;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.modal-content h3 {
+  font-size: 22px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-weight: 600;
+  color: #333;
+}
+
+.modal-content label {
+  display: block;
+  font-size: 14px;
+  font-weight: bold;
+  margin-top: 15px;
+  color: #444;
+}
+
+.modal-content input[type="text"],
+.modal-content input[type="email"],
+.modal-content input[type="tel"],
+.modal-content textarea,
+.modal-content input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.modal-content textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.modal-content p {
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.modal-content .button-info {
+  width: 100%;
+  background-color: #4a4ae2 !important;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.button-info-cerrar{
+  width: 100%;
+  background-color: grey;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-top: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.modal-content .button-info:hover {
+  background-color: #3a3ad1;
+}
+
+.modal-content .button-info:last-child {
+  background-color: #888;
+}
+
+.modal-content .button-info:last-child:hover {
+  background-color: #666;
+}
+
+@media (max-width: 768px) {
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+    font-size: 14px;
+  }
+
+  .modal-content h3 {
+    font-size: 18px;
+  }
+
+  .modal-content label {
+    font-size: 13px;
+  }
+
+  .modal-content input[type="text"],
+  .modal-content input[type="email"],
+  .modal-content input[type="tel"],
+  .modal-content textarea,
+  .modal-content input[type="file"] {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .modal-content .button-info {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
+
+.foto-empresa-wrapper {
+  position: relative;
+  display: inline-block;
+  margin: 10px;
+}
+
+.foto-empresa {
+  width: 120px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+}
+
+.foto-empresa-wrapper:hover .foto-empresa {
+  transform: scale(1.05);
+}
+
+.delete-icon {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: transparent;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 5px 7px;
+  font-size: 14px;
+  cursor: pointer;
+  display: none;
+}
+
+.foto-empresa-wrapper:hover .delete-icon {
+  display: block;
 }
