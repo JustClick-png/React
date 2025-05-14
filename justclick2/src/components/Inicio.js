@@ -11,7 +11,7 @@ import { FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import emailjs from 'emailjs-com';
 import { db, auth } from '../firebase/firebaseConfig';
-import { collection, getDocs, query, where, doc, updateDoc, addDoc } from 'firebase/firestore';
+import { collection, getDocs, query, where, doc, updateDoc, addDoc, deleteDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 
 function Inicio() {
@@ -170,6 +170,13 @@ function Inicio() {
   };
 
   useEffect(() => {
+    if (reservas.length > 0) {
+      filtrarReservasPorFecha(date); // usará la fecha que ya es hoy
+    }
+  }, [reservas]);
+
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         setIsAuthenticated(true);
@@ -196,7 +203,6 @@ function Inicio() {
             };
           });
           setReservas(reservasData);
-          filtrarReservasPorFecha(new Date()); // Al cargar, muestra reservas del día actual
 
           const mensajesQuery = query(
             collection(db, "chat"),
@@ -236,6 +242,17 @@ function Inicio() {
 
     return () => unsubscribe();
   }, []);
+
+  const eliminarReserva = async (reservaId) => {
+    try {
+      await deleteDoc(doc(db, 'reservas', reservaId));
+      setReservas(prev => prev.filter(r => r.id !== reservaId));
+      setMostrarModal(false);
+    } catch (error) {
+      console.error('Error al eliminar la reserva:', error);
+    }
+  };
+
 
   const handleEnviarRecordatorio = () => {
     if (!reservaSeleccionada) return;
@@ -414,24 +431,18 @@ function Inicio() {
                 <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Aceptada')}>
                   Aceptar
                 </button>
-                <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Cancelada')}>
+                <button onClick={() => eliminarReserva(reservaSeleccionada.id)}>
                   Cancelar
                 </button>
                 <button onClick={() => actualizarEstadoReserva(reservaSeleccionada.id, 'Completada')}>
                   Completada
                 </button>
                 <button
-                  onClick={handleEnviarRecordatorio}
-                  style={{
-                    backgroundColor: '#ffc107',
-                    color: 'white',
-                    padding: '8px',
-                    marginTop: '10px',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    marginBottom: '-10px',
+                  onClick={() => {
+                    handleEnviarRecordatorio();
+                    setMostrarModal(false);
                   }}
+                  className="btn-avisar"
                 >
                   Avisar
                 </button>
