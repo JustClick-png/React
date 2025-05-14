@@ -483,7 +483,7 @@ function Inicio() {
             </div>
             <div className="contacto-info">
               <p><FaEnvelope /> <a href="mailto:equipo.almi.a@gmail.com">equipo.almi.a@gmail.com</a></p>
-              <p><FaPhone /> <a href="tel:+34698375148">698375148</a></p>
+              <p><FaPhone /> <a href="tel:+34698375148">698 375 148</a></p>
               <p><FaMapMarkerAlt /> Agirre Lehendakariaren Etorb., 29, 48014 Bilbao</p>
             </div>
           </div>
@@ -497,7 +497,7 @@ function Inicio() {
             <h4>Contacta con Nosotros</h4>
             <ul>
               <li><FaEnvelope className="icon" /> <a href="mailto:equipo.almi.a@gmail.com">equipo.almi.a@gmail.com</a></li>
-              <li><FaPhone className="icon" /> <a href="tel:+34698375148">698375148</a></li>
+              <li><FaPhone className="icon" /> <a href="tel:+34698375148">698 375 148</a></li>
               <li><FaMapMarkerAlt className="icon" /> Agirre Lehendakariaren Etorb., 29, 48014 Bilbao</li>
             </ul>
           </div>

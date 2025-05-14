@@ -773,7 +773,7 @@ h4 {
     text-transform: capitalize;
     transition: color 0.3s;
     font-weight: bold;
-    margin-right: 0px !important;
+    margin-right: -10px !important;
     cursor: pointer;
 }
 
