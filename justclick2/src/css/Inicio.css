@@ -757,11 +757,67 @@ h4 {
 }
 
 @media (max-width: 768px) {
-  .nav-menu .container {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-    padding: 10px;
+.nav-menu .container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 8px; /* margen lateral reducido */
+    gap: 0;
+  }
+
+  .nav-menu a {
+    color: black;
+    font-size: 1rem;
+    text-decoration: none;
+    padding: 0px !important;
+    text-transform: capitalize;
+    transition: color 0.3s;
+    font-weight: bold;
+    margin-right: 0px !important;
+    cursor: pointer;
+}
+
+  .nav-menu .logo {
+      width: 150px;
+      height: auto;
+      margin-right: -35px;
+      margin-left: -75px;
+  }
+
+  .nav-left {
+    margin: 0;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 1px; /* espacio muy reducido entre items */
+    justify-content: center;
+    flex-grow: 1;
+  }
+
+  .nav-right {
+    display: flex;
+    gap: 6px;
+  }
+
+  .logo,
+  .perfil-img img,
+  .chat-btn img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .chat-btn {
+    margin: 0;
+    padding: 0;
+  }
+
+  .perfil-img img {
+    margin-top: 0;
+  }
+
+  .nav-menu {
+    padding: 0;
   }
 
   .texto-sobre-imagen .titulo,
