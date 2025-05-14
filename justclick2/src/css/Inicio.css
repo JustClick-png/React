@@ -767,13 +767,13 @@ h4 {
 
   .nav-menu a {
     color: black;
-    font-size: 0.7rem !important;
+    font-size: 0.85rem !important;
     text-decoration: none;
     padding: 0px !important;
     text-transform: capitalize;
     transition: color 0.3s;
     font-weight: bold;
-    margin-right: -10px !important;
+    margin-right: -15px !important;
     cursor: pointer;
 }
 
@@ -803,7 +803,7 @@ h4 {
   .chat-btn img {
     width: 32px;
     height: 32px;
-    margin-left: 10px;
+    margin-left: 20px;
   }
 
   .perfil-img img{
