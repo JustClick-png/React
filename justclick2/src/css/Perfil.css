@@ -271,3 +271,78 @@ h4 {
   margin-left: auto;
   margin-right: auto;
 }
+
+/* ========================= */
+/* 📱 RESPONSIVE PERFIL PAGE */
+/* ========================= */
+@media (max-width: 768px) {
+  .perfil-box {
+    width: 90%;
+    margin: 20px 0;
+    padding: 16px;
+  }
+
+  .perfil-info h2 {
+    font-size: 20px;
+  }
+
+  .perfil-info p {
+    font-size: 14px;
+  }
+
+  .perfil-map {
+    height: 250px;
+  }
+
+  .perfil-img {
+    width: 80px;
+    height: 80px;
+  }
+
+  .button-info {
+    width: 90%;
+    font-size: 14px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+  .nav-menu .container {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0;
+    padding: 8px 16px;
+  }
+
+  .nav-links {
+    gap: 10px;
+    font-size: 14px;
+  }
+
+  .nav-menu .logo {
+    width: 100px;
+  }
+
+  .nav-menu .perfil-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .contact-info, .social-media, .footer-links {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .button-logout {
+    width: 80%;
+    font-size: 14px;
+  }
+}
