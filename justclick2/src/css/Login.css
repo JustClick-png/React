@@ -89,3 +89,69 @@ input {
   font-size: 16px;
   margin-top: 10px;
 }
+
+@media (max-width: 768px) {
+  .login-container {
+    padding: 20px 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .login-box {
+    flex-direction: column-reverse; 
+    height: auto;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .login-left,
+  .login-right {
+    width: 100%;
+    padding: 50px 10px;
+  }
+
+  .login-left {
+    border-radius: 0 0 15px 15px;
+    background-color: white;
+  }
+
+  .login-right {
+    border-radius: 15px 15px 0 0;
+  }
+
+  .login-logo {
+    width: 150px;
+  }
+
+  .login-slogan {
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  input,
+  .button-iniciar {
+    width: 130% !important;
+    font-size: 15px;
+  }
+
+  .login-info h2 {
+    font-size: 20px;
+  }
+
+  .login-info p {
+    font-size: 14px;
+  }
+
+  p {
+    text-align: center;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+}
