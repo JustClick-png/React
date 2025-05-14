@@ -767,7 +767,7 @@ h4 {
 
   .nav-menu a {
     color: black;
-    font-size: 1rem;
+    font-size: 0.7rem !important;
     text-decoration: none;
     padding: 0px !important;
     text-transform: capitalize;
