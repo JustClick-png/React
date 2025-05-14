@@ -246,8 +246,13 @@ const Perfil = () => {
             </div>
 
             <label>Subir nuevas fotos:</label>
-            <input type="file" multiple onChange={handleFileChange} />
-
+            <input
+                type="file"
+                accept="image/*"
+                capture="environment"
+                multiple
+                onChange={handleFileChange}
+              />
             <button className="button-info" onClick={handleSubmitInfo} disabled={loading}>
               {loading ? "Guardando..." : "Guardar Cambios"}
             </button>
