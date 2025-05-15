@@ -23,7 +23,7 @@
 }
 
 .chat-buscador input {
-  width: 100%;
+  width: 100% !important;
   padding: 8px;
   border-radius: 6px;
   border: 1px solid #ccc;
@@ -208,7 +208,7 @@
 
   .chat-formulario input[type="text"],
   .chat-formulario button {
-    width: 100%;
+    width: 100% !important;
     font-size: 13px;
   }
 
