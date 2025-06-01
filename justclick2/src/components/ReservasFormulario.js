@@ -1,6 +1,6 @@
 // ReservasFormulario.js
 import React, { useState } from 'react';
-import { agregarReserva } from './firebaseFunctions'; // Importamos la función para agregar reservas
+import { agregarReserva } from './firebaseFunctions'; 
 
 const ReservasFormulario = () => {
   const [nombre, setNombre] = useState('');

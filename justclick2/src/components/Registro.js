@@ -56,7 +56,7 @@ const Registro = () => {
 
       navigate("/inicio");
     } catch (err) {
-      console.error("Error en el registro:", err); // Muestra el error en la consola
+      console.error("Error en el registro:", err); 
       if (err.code === "auth/email-already-in-use") {
         setError("El correo ya está en uso.");
       } else if (err.code === "auth/invalid-email") {
@@ -64,7 +64,7 @@ const Registro = () => {
       } else if (err.code === "auth/weak-password") {
         setError("La contraseña es demasiado débil. Usa al menos 6 caracteres.");
       } else {
-        setError(`Error al registrar: ${err.message}`); // Muestra el mensaje real del error
+        setError(`Error al registrar: ${err.message}`); 
       }
     }
     

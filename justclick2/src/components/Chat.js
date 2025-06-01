@@ -33,7 +33,6 @@ const Chat = () => {
     }
   };
 
-  // Detectar usuario autenticado
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -44,17 +43,15 @@ const Chat = () => {
     return () => unsubscribe();
   }, []);
 
-  // Obtener clientes desde Firestore
   useEffect(() => {
     const obtenerClientes = async () => {
       const snapshot = await getDocs(collection(db, 'cliente'));
-      const datos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const datos = snapshot.docs.map(doc => ({ clienteId: doc.id, ...doc.data() }));
       setClientes(datos);
     };
     obtenerClientes();
   }, []);
 
-  // Obtener clientes que tienen reserva con esta peluquería
   useEffect(() => {
     const obtenerClientesConReserva = async () => {
       if (!usuarioId) return;
@@ -69,14 +66,14 @@ const Chat = () => {
     obtenerClientesConReserva();
   }, [usuarioId]);
 
-  // Escuchar mensajes del cliente seleccionado
   useEffect(() => {
     if (!clienteSeleccionado) return;
 
     const q = query(
       collection(db, 'chat'),
-      where('clienteId', '==', Number(clienteSeleccionado.clienteId))
+      where('clienteId', '==', clienteSeleccionado.clienteId)
     );
+
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const mensajesData = [];
@@ -85,7 +82,6 @@ const Chat = () => {
         const data = docSnap.data();
         mensajesData.push(data);
 
-        // Marcar como leído si no soy el emisor
         if (data.emisorId !== emisorId && data.leido === false) {
           updateDoc(doc(db, 'chat', docSnap.id), { leido: true });
         }
@@ -97,7 +93,7 @@ const Chat = () => {
       });
 
       setMensajes(mensajesData);
-      setTimeout(scrollToBottom, 100); // Garantizar scroll al fondo tras renderizado
+      setTimeout(scrollToBottom, 100); 
     });
 
     return () => unsubscribe();
@@ -108,7 +104,7 @@ const Chat = () => {
     if (!nuevoMensaje.trim() || !clienteSeleccionado) return;
 
     await addDoc(collection(db, 'chat'), {
-      clienteId: Number(clienteSeleccionado.clienteId),
+      clienteId: clienteSeleccionado.clienteId,
       usuarioId,
       emisorId,
       mensaje: nuevoMensaje,
@@ -142,10 +138,8 @@ const Chat = () => {
           {clientesFiltrados.map((cliente) => (
             <li
               key={cliente.clienteId}
-              className={clienteSeleccionado?.clienteId === Number(cliente.clienteId) ? 'seleccionado' : ''}
-              onClick={() =>
-                setClienteSeleccionado({ ...cliente, clienteId: Number(cliente.clienteId) })
-              }
+              className={clienteSeleccionado?.clienteId === cliente.clienteId ? 'seleccionado' : ''}
+              onClick={() => setClienteSeleccionado(cliente)}
             >
               {cliente.nombre} {cliente.apellido1}
             </li>

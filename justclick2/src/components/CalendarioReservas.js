@@ -17,7 +17,7 @@ const CalendarioReservas = ({ selectedDate }) => {
       }
 
       setIsAuthenticated(true);
-      const empresaId = user.uid;  // El UID del usuario autenticado, que se usará como empresaId
+      const empresaId = user.uid;  
 
       const q = query(collection(db, "reservas"), where("empresaId", "==", empresaId));
       const querySnapshot = await getDocs(q);
@@ -27,7 +27,7 @@ const CalendarioReservas = ({ selectedDate }) => {
         return {
           id: doc.id,
           nombre: data.nombre,
-          fecha: data.fecha.toDate(), // Convierte el Timestamp a Date
+          fecha: data.fecha.toDate(), 
           hora: data.hora,
           clienteId: data.clienteId,
           servicio: data.servicio

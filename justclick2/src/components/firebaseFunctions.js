@@ -9,16 +9,16 @@ export const agregarReserva = async (nombre, fecha, hora) => {
     return;
   }
 
-  const empresaId = user.uid;  // Usamos el UID como empresaId
+  const empresaId = user.uid;  
 
-  const fechaTimestamp = Timestamp.fromDate(new Date(fecha));  // Convierte la fecha a un Timestamp
+  const fechaTimestamp = Timestamp.fromDate(new Date(fecha));  
 
   try {
     const docRef = await addDoc(collection(db, "reservas"), {
       nombre,
       fecha: fechaTimestamp,
       hora,
-      empresaId,  // Guardamos el ID de la empresa
+      empresaId,  
     });
     console.log("Reserva añadida con ID: ", docRef.id);
   } catch (e) {

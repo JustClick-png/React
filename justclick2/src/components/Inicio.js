@@ -106,7 +106,7 @@ function Inicio() {
 
 
   const filtrarReservasPorFecha = (fechaSeleccionada) => {
-  const fechaSolo = fechaSeleccionada.toDateString(); // Ignora hora
+  const fechaSolo = fechaSeleccionada.toDateString(); 
   const filtradas = reservas.filter(reserva =>
       reserva.fecha.toDateString() === fechaSolo
     );
@@ -171,7 +171,7 @@ function Inicio() {
 
   useEffect(() => {
     if (reservas.length > 0) {
-      filtrarReservasPorFecha(date); // usará la fecha que ya es hoy
+      filtrarReservasPorFecha(date); 
     }
   }, [reservas]);
 
@@ -211,24 +211,23 @@ function Inicio() {
           );
           const mensajesSnapshot = await getDocs(mensajesQuery);
 
-          // Filtramos solo los mensajes que NO ha enviado el usuario
           const mensajesNoLeidosParaMi = mensajesSnapshot.docs.filter(doc => doc.data().emisorId !== user.uid);
 
           setMensajesSinLeer(mensajesNoLeidosParaMi.length);
 
           const clientesSnapshot = await getDocs(collection(db, "cliente"));
           const clientesData = clientesSnapshot.docs.map(doc => {
-            const data = doc.data();
-            return {
-              id: doc.id,
-              clienteId: data.clienteId,
-              nombre: data.nombre,
-              apellido1: data.apellido1,
-              apellido2: data.apellido2,
-              telefono: data.telefono,
-              correo: data.correo
-            };
-          });
+          const data = doc.data();
+          return {
+            clienteId: doc.id, // ✅ ahora sí clienteId es el ID del documento
+            nombre: data.nombre,
+            apellido1: data.apellido1,
+            apellido2: data.apellido2,
+            telefono: data.telefono,
+            correo: data.correo
+          };
+        });
+
           setClientes(clientesData);
         } catch (error) {
           console.error("❌ Error cargando datos:", error);
@@ -267,7 +266,7 @@ function Inicio() {
     const hora = reservaSeleccionada.hora;
 
     const templateParams = {
-      to_email: cliente.correo,                         // este es el destino
+      to_email: cliente.correo,                         
       cliente_nombre: `${cliente.nombre} ${cliente.apellido1}`,
       fecha,
       hora,
@@ -460,7 +459,7 @@ function Inicio() {
             <form onSubmit={guardarNuevaReserva} className="formulario-reserva">
               <input type="date" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, fecha: e.target.value })} />
               <input type="time" required onChange={(e) => setNuevaReserva({ ...nuevaReserva, hora: e.target.value })} />
-              <select required onChange={(e) => setNuevaReserva({ ...nuevaReserva, clienteId: Number(e.target.value) })}>
+<select required onChange={(e) => setNuevaReserva({ ...nuevaReserva, clienteId: e.target.value })}>
                 <option value="">Selecciona cliente</option>
                 {clientes.map((cli, idx) => (
                   <option key={idx} value={cli.clienteId}>{cli.nombre} {cli.apellido1}</option>
